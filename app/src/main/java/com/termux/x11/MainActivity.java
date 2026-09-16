@@ -32,6 +32,7 @@ public class MainActivity extends FrameLayout {
     public void onDestroy() {}
     public void onDestroy(Activity activity) {}
     public void onConfigurationChanged(Configuration newConfig) {}
+    public void onWindowFocusChanged(boolean hasFocus) {}
     public void setTerminalToolbarViewVisible(boolean visible) {}
     public void setMainActivityOnKeyDown(MainActivityOnKeyDown listener) {}
     public void setSettingsClick(Runnable listener) {}
