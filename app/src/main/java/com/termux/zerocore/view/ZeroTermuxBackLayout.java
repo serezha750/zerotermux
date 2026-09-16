@@ -9,10 +9,8 @@ import android.widget.VideoView;
 
 import com.example.xh_lib.utils.UUtils;
 import com.termux.R;
+import com.termux.x11.MainActivity;
 
-/**
- * ZeroTermux 背景布局（已移除 X11 内部通道相关逻辑）。
- */
 public class ZeroTermuxBackLayout extends RelativeLayout {
     private View mBackgroundRoot;
     private View back_color;
@@ -47,7 +45,6 @@ public class ZeroTermuxBackLayout extends RelativeLayout {
         addView(viewLay);
     }
 
-    /** 兼容旧调用：X11 已移除，空实现。 */
     public void applyX11SystemInsets(android.app.Activity activity) {
         // no-op
     }
@@ -64,8 +61,7 @@ public class ZeroTermuxBackLayout extends RelativeLayout {
         return back_video;
     }
 
-    /** 兼容旧调用：X11 已移除，返回 null。 */
-    public Object getMainActivity() {
+    public MainActivity getMainActivity() {
         return null;
     }
 }

@@ -2,13 +2,10 @@ package com.termux.x11;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.view.KeyEvent;
 import android.widget.FrameLayout;
 
-/**
- * X11 功能已移除后的空实现 stub，保证现有调用方仍能编译。
- * 所有方法均为 no-op。
- */
 public class MainActivity extends FrameLayout {
 
     public interface MainActivityOnKeyDown {
@@ -29,27 +26,13 @@ public class MainActivity extends FrameLayout {
         return false;
     }
 
-    public void init() {
-        // no-op
-    }
-
-    public void onPause() {
-        // no-op
-    }
-
-    public void onResume() {
-        // no-op
-    }
-
-    public void onDestroy() {
-        // no-op
-    }
-
-    public void setTerminalToolbarViewVisible(boolean visible) {
-        // no-op
-    }
-
-    public void setMainActivityOnKeyDown(MainActivityOnKeyDown listener) {
-        // no-op
-    }
+    public void init() {}
+    public void onPause() {}
+    public void onResume() {}
+    public void onDestroy() {}
+    public void onDestroy(Activity activity) {}
+    public void onConfigurationChanged(Configuration newConfig) {}
+    public void setTerminalToolbarViewVisible(boolean visible) {}
+    public void setMainActivityOnKeyDown(MainActivityOnKeyDown listener) {}
+    public void setSettingsClick(Runnable listener) {}
 }
