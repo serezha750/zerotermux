@@ -29,12 +29,11 @@ import com.termux.zerocore.settings.MenuUpdateSourceActivity
 import com.termux.zerocore.settings.TimerActivity
 import com.termux.zerocore.settings.ZTAboutActivity
 import com.termux.zerocore.settings.ZTInstallActivity
-import com.termux.zerocore.settings.ZTOnlineServerActivity
+// ZTOnlineServerActivity / ZtWorkstationSettingsActivity 已移除
 import com.termux.zerocore.settings.ZeroTermuxSettingsActivity
 import com.termux.zerocore.settings.ZtDeveloperOptionsActivity
 import com.termux.zerocore.settings.ZtSettingsActivity
 import com.termux.zerocore.utermux_windows.qemu.activity.RunWindowActivity
-import com.termux.zerocore.workstation.ZtWorkstationSettingsActivity
 
 object ZtPageNavigationRegistry {
 
@@ -139,10 +138,9 @@ object ZtPageNavigationRegistry {
         PageEntry("termux_settings", R.string.zt_nav_page_termux_settings, SettingsActivity::class.java),
         PageEntry("zt_about", R.string.zt_nav_page_zt_about, ZTAboutActivity::class.java),
         PageEntry("zt_install", R.string.zt_nav_page_zt_install, ZTInstallActivity::class.java),
-        PageEntry("zt_online_server", R.string.zt_nav_page_zt_online_server, ZTOnlineServerActivity::class.java),
+        // zt_online_server / workstation_settings 线上功能已移除
         PageEntry("timer", R.string.zt_nav_page_timer, TimerActivity::class.java),
         PageEntry("container_settings", R.string.zt_nav_page_container_settings, ContainerSettingsMainActivity::class.java),
-        PageEntry("workstation_settings", R.string.zt_nav_page_workstation_settings, ZtWorkstationSettingsActivity::class.java),
         PageEntry("developer", R.string.zt_nav_page_developer, DeveloperActivity::class.java),
         PageEntry(
             "guide",

@@ -24,8 +24,7 @@ import com.termux.zerocore.aidebug.ZtAiDebugPermissionHelper
 import com.termux.zerocore.crashhistory.ZtCrashHistoryActivity
 import com.termux.zerocore.ftp.new_ftp.utils.NetworkEnvironmentUtil
 import com.termux.zerocore.ftp.utils.UserSetManage
-import com.termux.zerocore.utils.FileHttpUtils.Companion.get
-import com.termux.zerocore.workstation.ZtWorkstationSettingsActivity
+// FileHttpUtils / ZtWorkstationSettingsActivity 线上功能已移除
 import com.zp.z_file.util.LogUtils
 
 class ZtDeveloperOptionsActivity : BaseTitleActivity() {
@@ -67,20 +66,15 @@ class ZtDeveloperOptionsActivity : BaseTitleActivity() {
         ztDownloadServicesSwitch.setOnCheckedChangeListener { _, isChecked ->
             val ztUserBean = UserSetManage.get().getZTUserBean()
             ztUserBean.isOpenDownloadFileServices = isChecked
-            Thread {
-                if (isChecked) {
-                    if (!get().isServicesRun()) {
-                        get().bootHttp()
-                    }
-                } else {
-                    get().stopServer()
-                }
-            }.start()
+            // 线上 HTTP 下载服务已移除
+            if (isChecked) {
+                UUtils.showMsg("download service removed")
+            }
             UserSetManage.get().setZTUserBean(ztUserBean)
         }
 
         ztWorkstationLl.setOnClickListener {
-            startActivity(Intent(this, ZtWorkstationSettingsActivity::class.java))
+            UUtils.showMsg("workstation removed")
         }
 
         logOutputLl.setOnClickListener {

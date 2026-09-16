@@ -15,11 +15,7 @@ import com.termux.zerocore.config.ztcommand.config.QRCodeEncoderConfig;
 import com.termux.zerocore.config.ztcommand.config.RebootConfig;
 import com.termux.zerocore.config.ztcommand.config.ToastConfig;
 import com.termux.zerocore.config.ztcommand.config.VersionConfig;
-import com.termux.zerocore.config.ztcommand.config.X11CommandHideConfig;
-import com.termux.zerocore.config.ztcommand.config.X11CommandShowConfig;
-import com.termux.zerocore.config.ztcommand.config.X11KeyBoardHideConfig;
-import com.termux.zerocore.config.ztcommand.config.X11KeyBoardShowConfig;
-import com.termux.zerocore.config.ztcommand.config.X11StatusConfig;
+// X11 configs 已移除
 import com.termux.zerocore.config.ztcommand.config.XmlMenuConfig;
 import com.termux.zerocore.config.ztcommand.config.ZTBackgroundImageConfig;
 import com.termux.zerocore.config.ztcommand.config.ZTConfig;
@@ -51,20 +47,7 @@ public class ZTCommandConfigStore {
 
         map_array_command.put(ZTKeyConstants.ZT_COMMAND_LN, ZTKeyConstants.ZT_ID_LN);
         map_array_command.put(ZTKeyConstants.ZT_COMMAND_VNC, ZTKeyConstants.ZT_ID_VNC);
-
-        map_array_command.put(ZTKeyConstants.ZT_COMMAND_X11_COMMAND_SHOW, ZTKeyConstants.ZT_ID_X11_COMMAND_SHOW);
-        map_array_command.put(ZTKeyConstants.ZT_COMMAND_X11_COMMAND_SHOW_1, ZTKeyConstants.ZT_ID_X11_COMMAND_SHOW);
-
-        map_array_command.put(ZTKeyConstants.ZT_COMMAND_X11_COMMAND_HIDE, ZTKeyConstants.ZT_ID_X11_COMMAND_SHOW);
-        map_array_command.put(ZTKeyConstants.ZT_COMMAND_X11_COMMAND_HIDE_1, ZTKeyConstants.ZT_ID_X11_COMMAND_SHOW);
-
-        map_array_command.put(ZTKeyConstants.ZT_COMMAND_X11_STATUS, ZTKeyConstants.ZT_ID_X11_STATUS);
-
-        map_array_command.put(ZTKeyConstants.ZT_COMMAND_X11_KEYBOARD_SHOW, ZTKeyConstants.ZT_ID_X11_KEYBOARD_SHOW);
-        map_array_command.put(ZTKeyConstants.ZT_COMMAND_X11_KEYBOARD_SHOW_1, ZTKeyConstants.ZT_ID_X11_KEYBOARD_SHOW);
-
-        map_array_command.put(ZTKeyConstants.ZT_COMMAND_X11_KEYBOARD_HIDE, ZTKeyConstants.ZT_ID_X11_KEYBOARD_HIDE);
-        map_array_command.put(ZTKeyConstants.ZT_COMMAND_X11_KEYBOARD_HIDE_1, ZTKeyConstants.ZT_ID_X11_KEYBOARD_HIDE);
+        // X11 命令映射已移除
 
         map_array_command.put(ZTKeyConstants.ZT_COMMAND_CONFIRMED_DIALOG, ZTKeyConstants.ZT_ID_CONFIRMED_DIALOG);
         map_array_command.put(ZTKeyConstants.ZT_COMMAND_QR_CODE_ENCODER_CONFIG, ZTKeyConstants.ZT_ID_QR_CODE_ENCODER_CONFIG);
@@ -88,11 +71,7 @@ public class ZTCommandConfigStore {
         register(new RebootConfig());
         register(new LnConfig());
         register(new AVncConfig());
-        register(new X11CommandShowConfig());
-        register(new X11CommandHideConfig());
-        register(new X11StatusConfig());
-        register(new X11KeyBoardShowConfig());
-        register(new X11KeyBoardHideConfig());
+        // X11 config 注册已移除
         register(new ConfirmedDialogConfig());
         register(new QRCodeEncoderConfig());
         register(new ZTBackgroundImageConfig());

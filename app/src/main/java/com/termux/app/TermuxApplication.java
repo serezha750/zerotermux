@@ -171,7 +171,7 @@ ZFileManageHelp.getInstance().setFileOperateListener(new MyZFileOperateListener(
         LibSuManage.getInstall().initTimer();
         com.termux.zerocore.settings.timer.TimerResumeHelper.tryResumeTimer(this);
         MainMenuConfig.init(this);
-        com.termux.zerocore.workstation.ZtWorkstationLifecycleHelper.register(this);
+        // workstation 线上功能已移除
         new ClipBoardUtil().registerClipEvents();
 /*        new Thread(new Runnable() {
             @Override

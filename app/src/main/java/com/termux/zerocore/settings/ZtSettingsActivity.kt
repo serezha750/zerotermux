@@ -30,8 +30,9 @@ class ZtSettingsActivity : BaseTitleActivity() {
         findViewById<CardView>(R.id.developer_options_card).setOnClickListener {
             startActivity(Intent(this, ZtDeveloperOptionsActivity::class.java))
         }
-        findViewById<CardView>(R.id.online_sh_server).setOnClickListener {
-            startActivity(Intent(this, ZTOnlineServerActivity::class.java))
+        // 线上功能已移除：online_sh_server / ZTOnlineServerActivity
+        findViewById<CardView>(R.id.online_sh_server)?.setOnClickListener {
+            UUtils.showMsg(UUtils.getString(R.string.zt_settings) + " - online removed")
         }
         findViewById<CardView>(R.id.zt_about_card_view).setOnClickListener {
             startActivity(Intent(this, ZTAboutActivity::class.java))

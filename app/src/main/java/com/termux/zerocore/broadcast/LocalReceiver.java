@@ -17,7 +17,7 @@ import com.termux.app.TermuxActivity;
 import com.termux.terminal.Logger;
 import com.termux.zerocore.bosybox.BusyBoxManager;
 import com.termux.zerocore.developer.DeveloperActivity;
-import com.termux.zerocore.utils.FileHttpUtils;
+// FileHttpUtils 线上功能已移除
 import com.termux.zerocore.utils.Z7ExtracatUtils;
 import com.zp.z_file.zerotermux.ZTConfig;
 
@@ -144,17 +144,8 @@ public class LocalReceiver extends BroadcastReceiver {
 
         String broadcastHttp = intent.getStringExtra("broadcastHttp");
         if (broadcastHttp != null && !(broadcastHttp.isEmpty())) {
-            if (broadcastHttp.equals("open")) {
-                UUtils.showMsg("ok--open");
-                FileHttpUtils.Companion.get().startServer();
-                FileHttpUtils.Companion.get().setHttpBoot();
-            }
-            if (broadcastHttp.equals("close")) {
-                UUtils.showMsg("ok--close");
-                FileHttpUtils.Companion.get().stopServer();
-                FileHttpUtils.Companion.get().cancelHttpBoot();
-            }
-
+            // 线上 HTTP 服务已移除
+            UUtils.showMsg("http service removed");
             return;
         }
         String broadcastStartActivity = intent.getStringExtra("broadcastStartActivity");

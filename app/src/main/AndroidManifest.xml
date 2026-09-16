@@ -91,10 +91,7 @@
             android:name=".zerocore.settings.ZTInstallActivity"
             android:exported="false"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
-        <activity
-            android:name=".zerocore.settings.ZTOnlineServerActivity"
-            android:exported="false"
-            android:theme="@style/Theme.AppCompat.NoActionBar" />
+        <!-- ZTOnlineServerActivity 线上功能已移除 -->
         <activity
             android:name=".zerocore.settings.ZTAboutActivity"
             android:exported="false"
@@ -115,10 +112,7 @@
             android:name=".zerocore.crashhistory.ZtCrashDetailActivity"
             android:exported="false"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
-        <activity
-            android:name=".zerocore.workstation.ZtWorkstationSettingsActivity"
-            android:exported="false"
-            android:theme="@style/Theme.AppCompat.NoActionBar" />
+        <!-- ZtWorkstationSettingsActivity 线上功能已移除 -->
         <activity
             android:name=".zerocore.settings.LeftMenuSettingsActivity"
             android:exported="false"
@@ -159,10 +153,7 @@
             android:exported="false"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
 
-        <activity
-            android:name=".zerocore.settings.ZeroTermuxX11Settings"
-            android:exported="false"
-            android:theme="@style/Theme.AppCompat.NoActionBar" />
+        <!-- ZeroTermuxX11Settings X11 功能已移除 -->
 
         <activity
             android:name=".zerocore.settings.ZtSettingsActivity"
@@ -444,10 +435,7 @@
         <service android:name=".zerocore.config.ztcommand.ZTSocketService"/>
 
         <service android:name=".zerocore.ftp.FsService" />
-        <service
-            android:name=".zerocore.workstation.ZtWorkstationService"
-            android:exported="false"
-            android:foregroundServiceType="camera|dataSync" />
+        <!-- ZtWorkstationService 线上功能已移除 -->
         <service
             android:name=".zerocore.aidebug.ZtAiDebugService"
             android:exported="false"

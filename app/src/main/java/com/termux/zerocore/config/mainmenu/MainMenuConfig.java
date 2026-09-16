@@ -25,54 +25,45 @@ import com.termux.zerocore.config.mainmenu.config.OpenProjectClickConfig;
 import com.termux.zerocore.config.mainmenu.config.DataMessageClickConfig;
 import com.termux.zerocore.config.mainmenu.config.DefBashClickConfig;
 import com.termux.zerocore.config.mainmenu.config.DockerCheckClickConfig;
-import com.termux.zerocore.config.mainmenu.config.DownLoadClickConfig;
-import com.termux.zerocore.config.mainmenu.config.FixEnvironmentalErrorClickConfig;
 import com.termux.zerocore.config.mainmenu.config.FloatWindowsClickConfig;
 import com.termux.zerocore.config.mainmenu.config.FontSettingsClickConfig;
-import com.termux.zerocore.config.mainmenu.config.FtpDataClickConfig;
 import com.termux.zerocore.config.mainmenu.config.FullScreenClickConfig;
 import com.termux.zerocore.config.mainmenu.config.GitHubClickConfig;
-import com.termux.zerocore.config.mainmenu.config.HideCommandClickConfig;
-import com.termux.zerocore.config.mainmenu.config.HideX11KeyboardClickConfig;
 import com.termux.zerocore.config.mainmenu.config.InstallModuleClickConfig;
-import com.termux.zerocore.config.mainmenu.config.InstallX11ClickConfig;
 import com.termux.zerocore.config.mainmenu.config.KeyDataClickConfig;
 import com.termux.zerocore.config.mainmenu.config.LanguageClickConfig;
 import com.termux.zerocore.config.mainmenu.config.MainMenuClickConfig;
 import com.termux.zerocore.config.mainmenu.config.MoeClickConfig;
 import com.termux.zerocore.config.mainmenu.config.MyUsedSoftLinksDataClickConfig;
-import com.termux.zerocore.config.mainmenu.config.OnLineCommandClickConfig;
 import com.termux.zerocore.config.mainmenu.config.OpenPathClickConfig;
 import com.termux.zerocore.config.mainmenu.config.OpenTurnNetworkAdbClickConfig;
 import com.termux.zerocore.config.mainmenu.config.ParticleClickConfig;
 import com.termux.zerocore.config.mainmenu.config.PhoneSmsClickConfig;
-import com.termux.zerocore.config.mainmenu.config.PublicWarehouseClickConfig;
 import com.termux.zerocore.config.mainmenu.config.QEMUClickConfig;
 import com.termux.zerocore.config.mainmenu.config.ReleaseLinuxVersionClickConfig;
-import com.termux.zerocore.config.mainmenu.config.RemoteConnectionClickConfig;
 import com.termux.zerocore.config.mainmenu.config.ScheduledTaskClickConfig;
-import com.termux.zerocore.config.mainmenu.config.ShowCommandClickConfig;
-import com.termux.zerocore.config.mainmenu.config.ShowX11KeyboardClickConfig;
 import com.termux.zerocore.config.mainmenu.config.SnowflakeClickConfig;
 import com.termux.zerocore.config.mainmenu.config.SwitchSourceClickConfig;
 import com.termux.zerocore.config.mainmenu.config.UnInstallClickConfig;
-import com.termux.zerocore.config.mainmenu.config.VNCClickConfig;
-import com.termux.zerocore.config.mainmenu.config.WebDataClickConfigImp;
-import com.termux.zerocore.config.mainmenu.config.X11EnvironmentClickConfig;
-import com.termux.zerocore.config.mainmenu.config.X11SettingsClickConfig;
 import com.termux.zerocore.config.mainmenu.config.X86AlpineDataClickConfig;
 import com.termux.zerocore.config.mainmenu.config.ZTCommandKeyClickConfig;
 import com.termux.zerocore.config.mainmenu.config.ZTSettingsClickConfig;
-import com.termux.zerocore.config.mainmenu.config.ZeroBBsClickConfig;
-import com.termux.zerocore.config.mainmenu.config.ZeroFunctionClickConfig;
 import com.termux.zerocore.config.mainmenu.data.MainMenuCategoryData;
 
 import java.util.ArrayList;
 
+/**
+ * 主菜单配置（已移除 X11 功能、线上功能相关入口）。
+ * 保留：开机启动、ZT 目录相关、容器切换、备份恢复等。
+ */
 public class MainMenuConfig implements BaseConfig {
     public static final int CODE_COMMON_FUNCTIONS = 0;
+    /** @deprecated X11 功能已移除，保留常量避免外部引用崩溃 */
+    @Deprecated
     public static final int CODE_X11_FEATURES = 1;
     public static final int CODE_BEAUTIFICATION_FUNCTION = 2;
+    /** @deprecated 线上功能已移除，保留常量避免外部引用崩溃 */
+    @Deprecated
     public static final int CODE_ONLINE_FEATURES = 3;
     public static final int CODE_ZT_FEATURES = 4;
     public static final int CODE_ZT_ROOT = 5;
@@ -80,13 +71,13 @@ public class MainMenuConfig implements BaseConfig {
     public static final int CODE_ZT_CONFIG = 7;
     public static final int CODE_CREATE_PROJECT = 8;
 
-    // 主页分类
     private static ArrayList<MainMenuCategoryData> MAIN_MENU_CATEGORY_DATAS = new ArrayList<>();
 
     public static void init(Context context) {
+        MAIN_MENU_CATEGORY_DATAS.clear();
+
         // 常用功能
         ArrayList<MainMenuClickConfig> commonClicks = new ArrayList<>();
-        // 切换源
         commonClicks.add(new SwitchSourceClickConfig());
         commonClicks.add(new ContainerSwitchClickConfig());
         commonClicks.add(new BackupRestoreClickConfig());
@@ -107,18 +98,8 @@ public class MainMenuConfig implements BaseConfig {
         createProjectClicks.add(new OpenProjectClickConfig());
         MAIN_MENU_CATEGORY_DATAS.add(new MainMenuCategoryData(context.getString(R.string.menu_create_project), CODE_CREATE_PROJECT, createProjectClicks));
 
-        // x11功能
-        ArrayList<MainMenuClickConfig> x11Clicks = new ArrayList<>();
-        x11Clicks.add(new X11SettingsClickConfig());
-        x11Clicks.add(new ShowCommandClickConfig());
-        x11Clicks.add(new HideCommandClickConfig());
-        x11Clicks.add(new X11EnvironmentClickConfig());
-        x11Clicks.add(new FixEnvironmentalErrorClickConfig());
-        x11Clicks.add(new InstallX11ClickConfig());
-        x11Clicks.add(new ShowX11KeyboardClickConfig());
-        x11Clicks.add(new HideX11KeyboardClickConfig());
-        x11Clicks.add(new VNCClickConfig());
-        MAIN_MENU_CATEGORY_DATAS.add(new MainMenuCategoryData(context.getString(R.string.x11_features), CODE_X11_FEATURES, x11Clicks));
+        // X11 功能 — 已彻底移除
+        // 线上功能 — 已彻底移除
 
         // 美化/UI 功能
         ArrayList<MainMenuClickConfig> beautificationClicks = new ArrayList<>();
@@ -127,15 +108,16 @@ public class MainMenuConfig implements BaseConfig {
         beautificationClicks.add(new FontSettingsClickConfig());
         beautificationClicks.add(new FullScreenClickConfig());
         beautificationClicks.add(new SnowflakeClickConfig());
-        beautificationClicks.add(new WebDataClickConfigImp());
         beautificationClicks.add(new ParticleClickConfig());
         beautificationClicks.add(new ClearStyleClickConfig());
         MAIN_MENU_CATEGORY_DATAS.add(new MainMenuCategoryData(context.getString(R.string.beautification_function), CODE_BEAUTIFICATION_FUNCTION, beautificationClicks));
+
         // 需要引擎
         ArrayList<MainMenuClickConfig> engineClicks = new ArrayList<>();
         engineClicks.add(new KeyDataClickConfig());
         engineClicks.add(new X86AlpineDataClickConfig());
         MAIN_MENU_CATEGORY_DATAS.add(new MainMenuCategoryData(context.getString(R.string.zt_engine), CODE_ZT_ENGINE, engineClicks));
+
         // ROOT 功能
         ArrayList<MainMenuClickConfig> rootClicks = new ArrayList<>();
         rootClicks.add(new OpenTurnNetworkAdbClickConfig());
@@ -143,15 +125,7 @@ public class MainMenuConfig implements BaseConfig {
         rootClicks.add(new DockerCheckClickConfig());
         MAIN_MENU_CATEGORY_DATAS.add(new MainMenuCategoryData(context.getString(R.string.zt_root_fun), CODE_ZT_ROOT, rootClicks));
 
-        // 线上功能
-        ArrayList<MainMenuClickConfig> onlineClicks = new ArrayList<>();
-        onlineClicks.add(new OnLineCommandClickConfig());
-        onlineClicks.add(new ZeroBBsClickConfig());
-        onlineClicks.add(new DownLoadClickConfig());
-        onlineClicks.add(new PublicWarehouseClickConfig());
-        MAIN_MENU_CATEGORY_DATAS.add(new MainMenuCategoryData(context.getString(R.string.online_features), CODE_ONLINE_FEATURES, onlineClicks));
-
-        // 配置文件
+        // 配置文件（保留开机启动）
         ArrayList<MainMenuClickConfig> configClicks = new ArrayList<>();
         configClicks.add(new AdbShellRunClickConfig());
         configClicks.add(new ZTCommandKeyClickConfig());
@@ -162,20 +136,16 @@ public class MainMenuConfig implements BaseConfig {
         configClicks.add(new BootCommandClickConfig());
         MAIN_MENU_CATEGORY_DATAS.add(new MainMenuCategoryData(context.getString(R.string.zt_menu_title_config), CODE_ZT_CONFIG, configClicks));
 
-        // ZT功能
+        // ZT功能（已移除 FTP、远程连接等线上相关）
         ArrayList<MainMenuClickConfig> ztFeaturesClicks = new ArrayList<>();
         ztFeaturesClicks.add(new InstallModuleClickConfig());
-        ztFeaturesClicks.add(new FtpDataClickConfig());
         ztFeaturesClicks.add(new CommonlyUsedSoftLinksDataClickConfig());
         ztFeaturesClicks.add(new MyUsedSoftLinksDataClickConfig());
         ztFeaturesClicks.add(new UnInstallClickConfig());
-        ztFeaturesClicks.add(new RemoteConnectionClickConfig());
-        // ztFeaturesClicks.add(new ZeroFunctionClickConfig());
         ztFeaturesClicks.add(new PhoneSmsClickConfig());
         ztFeaturesClicks.add(new ScheduledTaskClickConfig());
         ztFeaturesClicks.add(new OpenPathClickConfig());
         ztFeaturesClicks.add(new DataMessageClickConfig());
-        // ztFeaturesClicks.add(new ExperimentClickConfig());
         ztFeaturesClicks.add(new LanguageClickConfig());
         ztFeaturesClicks.add(new GitHubClickConfig());
         MAIN_MENU_CATEGORY_DATAS.add(new MainMenuCategoryData(context.getString(R.string.zt_features), CODE_ZT_FEATURES, ztFeaturesClicks));

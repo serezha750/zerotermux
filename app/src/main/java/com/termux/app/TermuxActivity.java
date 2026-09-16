@@ -145,7 +145,7 @@ import com.termux.zerocore.config.ztcommand.navigation.ZtNavigationHelper;
 import com.termux.zerocore.config.ztcommand.navigation.ZtNavigationHost;
 import com.termux.zerocore.url.FileUrl;
 import com.termux.zerocore.utils.BitmapUtils;
-import com.termux.zerocore.utils.FileHttpUtils;
+// FileHttpUtils 线上功能已移除
 import com.termux.zerocore.utils.FileIOUtils;
 import com.termux.zerocore.utils.IsInstallCommand;
 import com.termux.zerocore.utils.PhoneUtils;
@@ -3174,20 +3174,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
 	 // ZeroTermux add {@
     private void initUserData() {
         ZTUserBean ztUserBean = UserSetManage.Companion.get().getZTUserBean();
-        if (ztUserBean.isOpenDownloadFileServices()) {
-            new Thread(() -> {
-               if (!FileHttpUtils.Companion.get().isServicesRun()) {
-                   FileHttpUtils.Companion.get().bootHttp();
-               }
-            }).start();
-        }
-        if (ztUserBean.isZtWorkstationEnabled()) {
-            if (ztUserBean.isZtWorkstationAutoStart()) {
-                com.termux.zerocore.workstation.ZtWorkstationManager.ensureRunningIfEnabled(this);
-            } else {
-                com.termux.zerocore.workstation.ZtWorkstationManager.ensureRunningForActiveSession(this);
-            }
-        }
+        // 线上功能（FileHttp / Workstation）已移除
         if (ztUserBean.isZtAiDebugEnabled()) {
             com.termux.zerocore.aidebug.ZtAiDebugManager.ensureRunningForActiveSession(this);
         }
