@@ -23,7 +23,6 @@ import com.termux.zerocore.activity.EditTextActivity;
 import com.termux.zerocore.activity.WebViewActivity;
 import com.termux.zerocore.config.mainmenu.config.BaseMenuClickConfig;
 import com.termux.zerocore.config.mainmenu.config.MainMenuClickConfig;
-import com.termux.zerocore.config.mainmenu.config.OnLineCommandClickConfig;
 import com.termux.zerocore.config.mainmenu.config.XMLClickConfig;
 import com.termux.zerocore.config.mainmenu.data.MainMenuCategoryData;
 import com.termux.zerocore.dialog.SwitchDialog;
@@ -201,7 +200,8 @@ public class XMLMainMenuConfig {
                     String url = clickAction.replace(START_WITH_SHELL_URL, "").trim();
                     configs.add(getXmlClickConfig(context, name, icon, (view, context1) -> {
                         try {
-                          new OnLineCommandClickConfig().showOnLineShDialog(url, context);
+                          // 线上功能已移除
+                          Toast.makeText(context, "online shell removed", Toast.LENGTH_SHORT).show();
                         } catch (Exception e) {
                             e.printStackTrace();
                             Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
