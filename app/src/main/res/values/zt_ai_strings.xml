@@ -189,7 +189,7 @@
     <string name="zt_ai_pkg_source_switched_msg">Switch command sent to terminal; wait for apt to finish</string>
 
     <!-- Containers -->
-    <string name="zt_ai_container_menu_equiv">Left menu Common Functions → Container Switch (ContainerSwitchClickConfig)</string>
+    <string name="zt_ai_container_menu_equiv">Container management (menu item removed)</string>
     <string name="zt_ai_container_delete_confirm_hint">Deletion is irreversible. Explain container name and consequences; call delete_zerotermux_container with user_confirmed=true only after explicit approval.</string>
     <string name="zt_ai_container_delete_warning">Permanently deletes all Termux data in that container (home, packages, etc.). Cannot be undone.</string>
     <string-array name="zt_ai_container_workflow">

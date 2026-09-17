@@ -109,16 +109,10 @@
         <item tag="Switch Source"
             name="Switch Source"
             click="java:com.termux.zerocore.config.mainmenu.config.SwitchSourceClickConfig" />
-        <item tag="Container Switch"
-            click="java:com.termux.zerocore.config.mainmenu.config.ContainerSwitchClickConfig" />
         <item tag="Backup/Restore"
             click="java:com.termux.zerocore.config.mainmenu.config.BackupRestoreClickConfig" />
-        <item tag="MOE All-in-One"
-            click="java:com.termux.zerocore.config.mainmenu.config.MoeClickConfig" />
         <item tag="Haircut Version"
             click="java:com.termux.zerocore.config.mainmenu.config.ReleaseLinuxVersionClickConfig" />
-        <item tag="QEMU"
-            click="java:com.termux.zerocore.config.mainmenu.config.QEMUClickConfig" />
         <item tag="ZT Settings"
             click="java:com.termux.zerocore.config.mainmenu.config.ZTSettingsClickConfig" />
     </group>

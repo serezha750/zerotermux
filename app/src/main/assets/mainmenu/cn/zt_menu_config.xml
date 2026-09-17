@@ -113,16 +113,10 @@
         <item tag="切换源"
             name="切换源"
             click="java:com.termux.zerocore.config.mainmenu.config.SwitchSourceClickConfig" />
-        <item tag="容器切换"
-            click="java:com.termux.zerocore.config.mainmenu.config.ContainerSwitchClickConfig" />
         <item tag="备份/恢复"
             click="java:com.termux.zerocore.config.mainmenu.config.BackupRestoreClickConfig" />
-        <item tag="MOE全能"
-            click="java:com.termux.zerocore.config.mainmenu.config.MoeClickConfig" />
         <item tag="发型版本"
             click="java:com.termux.zerocore.config.mainmenu.config.ReleaseLinuxVersionClickConfig" />
-        <item tag="QEMU"
-            click="java:com.termux.zerocore.config.mainmenu.config.QEMUClickConfig" />
         <item tag="ZT设置"
             click="java:com.termux.zerocore.config.mainmenu.config.ZTSettingsClickConfig" />
     </group>

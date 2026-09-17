@@ -14,7 +14,6 @@ import com.termux.zerocore.config.mainmenu.config.ClearStyleClickConfig;
 import com.termux.zerocore.config.mainmenu.config.CloseTurnNetworkAdbClickConfig;
 import com.termux.zerocore.config.mainmenu.config.CommandDefinitionCLickConfig;
 import com.termux.zerocore.config.mainmenu.config.CommonlyUsedSoftLinksDataClickConfig;
-import com.termux.zerocore.config.mainmenu.config.ContainerSwitchClickConfig;
 import com.termux.zerocore.config.mainmenu.config.DataMessageClickConfig;
 import com.termux.zerocore.config.mainmenu.config.DefBashClickConfig;
 import com.termux.zerocore.config.mainmenu.config.DockerCheckClickConfig;
@@ -26,13 +25,11 @@ import com.termux.zerocore.config.mainmenu.config.InstallModuleClickConfig;
 import com.termux.zerocore.config.mainmenu.config.KeyDataClickConfig;
 import com.termux.zerocore.config.mainmenu.config.LanguageClickConfig;
 import com.termux.zerocore.config.mainmenu.config.MainMenuClickConfig;
-import com.termux.zerocore.config.mainmenu.config.MoeClickConfig;
 import com.termux.zerocore.config.mainmenu.config.MyUsedSoftLinksDataClickConfig;
 import com.termux.zerocore.config.mainmenu.config.OpenPathClickConfig;
 import com.termux.zerocore.config.mainmenu.config.OpenTurnNetworkAdbClickConfig;
 import com.termux.zerocore.config.mainmenu.config.ParticleClickConfig;
 import com.termux.zerocore.config.mainmenu.config.PhoneSmsClickConfig;
-import com.termux.zerocore.config.mainmenu.config.QEMUClickConfig;
 import com.termux.zerocore.config.mainmenu.config.ReleaseLinuxVersionClickConfig;
 import com.termux.zerocore.config.mainmenu.config.ScheduledTaskClickConfig;
 import com.termux.zerocore.config.mainmenu.config.SnowflakeClickConfig;
@@ -47,7 +44,7 @@ import java.util.ArrayList;
 
 /**
  * 主菜单配置（已移除 X11 功能、线上功能相关入口）。
- * 保留：开机启动、ZT 目录相关、容器切换、备份恢复等。
+ * 保留：开机启动、ZT 目录相关、备份恢复等。
  */
 public class MainMenuConfig implements BaseConfig {
     public static final int CODE_COMMON_FUNCTIONS = 0;
@@ -73,11 +70,8 @@ public class MainMenuConfig implements BaseConfig {
         // 常用功能
         ArrayList<MainMenuClickConfig> commonClicks = new ArrayList<>();
         commonClicks.add(new SwitchSourceClickConfig());
-        commonClicks.add(new ContainerSwitchClickConfig());
         commonClicks.add(new BackupRestoreClickConfig());
-        commonClicks.add(new MoeClickConfig());
         commonClicks.add(new ReleaseLinuxVersionClickConfig());
-        commonClicks.add(new QEMUClickConfig());
         commonClicks.add(new ZTSettingsClickConfig());
         MAIN_MENU_CATEGORY_DATAS.add(new MainMenuCategoryData(context.getString(R.string.common_functions), CODE_COMMON_FUNCTIONS, commonClicks));
 

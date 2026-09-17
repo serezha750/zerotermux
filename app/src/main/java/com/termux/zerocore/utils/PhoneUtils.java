@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.example.xh_lib.utils.UUtils;
 import com.termux.R;
-import com.termux.zerocore.utermux_windows.qemu.data.MyContacts;
+import com.termux.zerocore.data.MyContacts;
 
 import java.util.ArrayList;
 

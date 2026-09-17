@@ -196,7 +196,7 @@
 
     <!-- Containers -->
     <string name="zt_ai_container_hint">多容器同左侧「容器切换」。先 list_zerotermux_containers；新建 create_zerotermux_container；切换 switch_zerotermux_container（切换后须重启）；删除 delete_zerotermux_container 且 user_confirmed=true。不可删主容器与当前活跃容器。</string>
-    <string name="zt_ai_container_menu_equiv">左侧菜单 常用功能 → 容器切换 (ContainerSwitchClickConfig)</string>
+    <string name="zt_ai_container_menu_equiv">容器管理（菜单项已移除）</string>
     <string name="zt_ai_container_delete_confirm_hint">删除不可恢复。向用户说明容器名称与后果，用户明确同意后再调用 delete_zerotermux_container 且 user_confirmed=true。</string>
     <string name="zt_ai_container_delete_warning">将永久删除该容器内全部 Termux 数据（home、已装包等），无法恢复。</string>
     <string-array name="zt_ai_container_workflow">

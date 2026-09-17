@@ -22,16 +22,11 @@ public object CodeString {
         "apt update && apt upgrade \n"
     public val UpDate: String = "pkg update -y \n"
     public val runLinuxSh: String = "pkg update -y && pkg install proot-distro -y && proot-distro list && echo '' && echo '=== proot-distro ===' && echo 'install: proot-distro install <alias>' && echo 'login:   proot-distro login <alias>' && echo 'remove:  proot-distro remove <alias>' && echo 'docs:    https://github.com/termux/proot-distro' && echo ''\n"
-    public val runQemuSh: String = "cd ~ && cd ~ && chmod 777 utqemu.sh && ./utqemu.sh \n"
-    public val runWin7Sh: String = "cd ~ && cd ~ && chmod 777 qemu_win7.sh && ./qemu_win7.sh \n"
-    public val runWinXPSh: String = "cd ~ && cd ~ && chmod 777 qemu_winxp.sh && ./qemu_winxp.sh \n"
     public val runMoeSh: String = "pkg install -y curl ; bash -c \"$(curl -L gitee.com/mo2/linux/raw/2/2)\" \n"
     public val runsmsChomdSh: String = "cd .. && cd usr && cd bin && chmod 777 smsread && cd ~ \n"
     public val runPhoneChomdSh: String = "cd .. && cd usr && cd bin && chmod 777 readcontacts && cd ~ \n"
     public val runsmsInstallSh: String = "cd ~ && pkg update -y && pkg install vim -y \n"
     public val runstartSh: String = "cd ~ && cd ~ && cd .xinhao_history && chmod 777 start_command.sh && cd ~ \n"
-
-    public var runLineQemu = "cd ~ && pkg update -y && pkg install wget -y && wget https://od.ixcmstudio.cn/repository/main/qemu_sh/utqemu.sh && chmod 777 utqemu.sh && ./utqemu.sh"
     public var runDocker = "pkg update && pkg install tsu wget -y && cd ~ && chmod 777 check-config.sh && sed -i '1s_.*_#!/data/data/com.termux/files/usr/bin/bash_' check-config.sh && sudo ./check-config.sh\n"
     public val contentSSH = " { command -v ssh >/dev/null || pkg install openssh -y >/dev/null 2>&1; } && { command -v sshpass >/dev/null || pkg install sshpass -y >/dev/null 2>&1; } \n"
 

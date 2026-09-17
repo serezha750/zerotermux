@@ -33,7 +33,6 @@ import com.termux.zerocore.settings.ZTInstallActivity
 import com.termux.zerocore.settings.ZeroTermuxSettingsActivity
 import com.termux.zerocore.settings.ZtDeveloperOptionsActivity
 import com.termux.zerocore.settings.ZtSettingsActivity
-import com.termux.zerocore.utermux_windows.qemu.activity.RunWindowActivity
 
 object ZtPageNavigationRegistry {
 
@@ -170,7 +169,6 @@ object ZtPageNavigationRegistry {
         PageEntry("font", R.string.zt_nav_page_font, FontActivity::class.java),
         PageEntry("switch_system", R.string.zt_nav_page_switch_system, SwitchActivity::class.java),
         PageEntry("scrcpy", R.string.zt_nav_page_scrcpy, MainActivity::class.java),
-        PageEntry("qemu_run", R.string.zt_nav_page_qemu_run, RunWindowActivity::class.java),
         PageEntry("webview", R.string.zt_nav_page_webview, WebViewActivity::class.java),
         PageEntry("help", R.string.zt_nav_page_help, HelpActivity::class.java),
         PageEntry("zt_command_socket", R.string.zt_nav_page_zt_command_socket, SocketBaseActivity::class.java),
