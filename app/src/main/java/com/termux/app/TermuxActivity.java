@@ -167,6 +167,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -2331,50 +2332,47 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
     }
 
     private void fragmentManager(int index) {
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager()
-            .beginTransaction();
+        // 性能：复用 ZFileListFragment，避免每次打开都 remove+replace 导致重新 listFiles / 重新绑列表卡顿
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
 
-        LogUtils.e(TAG, "fragmentManager fragmentTransaction is: " + fragmentTransaction);
+        Fragment fileListFragment = fm.findFragmentByTag("ZFileListFragment");
+        Fragment deepSeekFragment = fm.findFragmentByTag("DeepSeekTransitFragment");
+        Fragment deepSeekMainFragment = fm.findFragmentByTag("DeepSeekMainFragment");
+        Fragment llmFragment = fm.findFragmentByTag("LLMMainFragment");
 
-        // 1. 先移除可能存在的所有 Fragment
-        Fragment fileListFragment = getSupportFragmentManager()
-            .findFragmentByTag("ZFileListFragment");
-        Fragment deepSeekFragment = getSupportFragmentManager()
-            .findFragmentByTag("DeepSeekTransitFragment");
-        Fragment deepSeekMainFragment = getSupportFragmentManager()
-            .findFragmentByTag("DeepSeekMainFragment");
-        Fragment llmFragment = getSupportFragmentManager()
-            .findFragmentByTag("LLMMainFragment");
-
-        if (fileListFragment != null) {
-            fragmentTransaction.remove(fileListFragment);
-            LogUtils.e(TAG, "Removed existing ZFileListFragment");
-        }
+        // AI 相关页仍按需移除，避免与文件页叠层
         if (deepSeekFragment != null) {
-            fragmentTransaction.remove(deepSeekFragment);
+            ft.remove(deepSeekFragment);
         }
         if (deepSeekMainFragment != null) {
-            fragmentTransaction.remove(deepSeekMainFragment);
+            ft.remove(deepSeekMainFragment);
         }
         if (llmFragment != null) {
-            fragmentTransaction.remove(llmFragment);
-        }
-
-        // 2. 立即提交移除操作，确保状态被清理
-        try {
-            fragmentTransaction.commitNowAllowingStateLoss();
-        } catch (Exception e) {
-            LogUtils.e(TAG, "Error in commitNowAllowingStateLoss: " + e.getMessage());
-            // 如果 commitNow 失败，使用普通 commit
-            fragmentTransaction.commitAllowingStateLoss();
-            getSupportFragmentManager().executePendingTransactions();
+            ft.remove(llmFragment);
         }
 
         if (index == 0) {
-            LogUtils.e(TAG, "fragmentManager switch ZFileListFragment. ");
-            fragmentTransaction.replace(R.id.frame_file, ZFileListFragment.newInstance(), "ZFileListFragment")
-                .commitAllowingStateLoss();
-            LogUtils.e(TAG, "fragmentManager switch ZFileListFragment deno. ");
+            if (fileListFragment == null) {
+                fileListFragment = ZFileListFragment.newInstance();
+                ft.add(R.id.frame_file, fileListFragment, "ZFileListFragment");
+            } else {
+                ft.show(fileListFragment);
+            }
+        } else if (fileListFragment != null) {
+            ft.hide(fileListFragment);
+        }
+
+        try {
+            ft.commitNowAllowingStateLoss();
+        } catch (Exception e) {
+            LogUtils.e(TAG, "fragmentManager commit error: " + e.getMessage());
+            try {
+                ft.commitAllowingStateLoss();
+                fm.executePendingTransactions();
+            } catch (Exception e2) {
+                LogUtils.e(TAG, "fragmentManager fallback commit error: " + e2.getMessage());
+            }
         }
         ZTConfig.INSTANCE.setCloseListener(() -> getDrawer().smoothClose());
     }
