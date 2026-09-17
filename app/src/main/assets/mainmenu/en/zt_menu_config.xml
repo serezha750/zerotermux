@@ -123,51 +123,6 @@
             click="java:com.termux.zerocore.config.mainmenu.config.ZTSettingsClickConfig" />
     </group>
 
-    <group name="Create Project">
-        <item tag="C"
-            name="C"
-            click="java:com.termux.zerocore.config.mainmenu.config.CreateCProjectClickConfig" />
-        <item tag="JAVA"
-            name="JAVA"
-            click="java:com.termux.zerocore.config.mainmenu.config.CreateJavaProjectClickConfig" />
-        <item tag="PYTHON"
-            name="PYTHON"
-            click="java:com.termux.zerocore.config.mainmenu.config.CreatePythonProjectClickConfig" />
-        <item tag="PHP"
-            name="PHP"
-            click="java:com.termux.zerocore.config.mainmenu.config.CreatePhpProjectClickConfig" />
-        <item tag="NPM"
-            name="NPM"
-            click="java:com.termux.zerocore.config.mainmenu.config.CreateNpmProjectClickConfig" />
-        <item tag="VS Code"
-            name="VS Code"
-            click="java:com.termux.zerocore.config.mainmenu.config.CreateVscodeClickConfig" />
-        <item tag="Open Project"
-            name="Open Project"
-            click="java:com.termux.zerocore.config.mainmenu.config.OpenProjectClickConfig" />
-    </group>
-
-    <group name="X11 Functions">
-        <item tag="X11 Settings"
-            click="java:com.termux.zerocore.config.mainmenu.config.X11SettingsClickConfig" />
-        <item tag="Show Terminal"
-            click="java:com.termux.zerocore.config.mainmenu.config.ShowCommandClickConfig" />
-        <item tag="Hide Terminal"
-            click="java:com.termux.zerocore.config.mainmenu.config.HideCommandClickConfig" />
-        <item tag="X11 Environment"
-            click="java:com.termux.zerocore.config.mainmenu.config.X11EnvironmentClickConfig" />
-        <item tag="Fix Environment Error"
-            click="java:com.termux.zerocore.config.mainmenu.config.FixEnvironmentalErrorClickConfig" />
-        <item tag="Install X11"
-            click="java:com.termux.zerocore.config.mainmenu.config.InstallX11ClickConfig" />
-        <item tag="Show Keyboard"
-            click="java:com.termux.zerocore.config.mainmenu.config.ShowX11KeyboardClickConfig" />
-        <item tag="Hide Keyboard"
-            click="java:com.termux.zerocore.config.mainmenu.config.HideX11KeyboardClickConfig" />
-        <item tag="VNC"
-            click="java:com.termux.zerocore.config.mainmenu.config.VNCClickConfig" />
-    </group>
-
     <group name="Beautification/UI Functions">
         <item tag="Floating Window"
             click="java:com.termux.zerocore.config.mainmenu.config.FloatWindowsClickConfig" />
@@ -201,17 +156,6 @@
             click="java:com.termux.zerocore.config.mainmenu.config.CloseTurnNetworkAdbClickConfig" />
         <item tag="Docker Check"
             click="java:com.termux.zerocore.config.mainmenu.config.DockerCheckClickConfig" />
-    </group>
-
-    <group name="Online Functions">
-        <item tag="Online Scripts"
-            click="java:com.termux.zerocore.config.mainmenu.config.OnLineCommandClickConfig" />
-        <item tag="Zero Forum"
-            click="java:com.termux.zerocore.config.mainmenu.config.ZeroBBsClickConfig" />
-        <item tag="Download Station"
-            click="java:com.termux.zerocore.config.mainmenu.config.DownLoadClickConfig" />
-        <item tag="Public Repository"
-            click="java:com.termux.zerocore.config.mainmenu.config.PublicWarehouseClickConfig" />
     </group>
 
     <group name="Configure Terminal">

@@ -71,10 +71,6 @@ public class ProgramMainMenuConfig {
             "常用功能", "Common Functions")) {
             return MainMenuConfig.CODE_COMMON_FUNCTIONS;
         }
-        if (groupNameMatches(context, groupName, R.string.menu_create_project,
-            "创建项目", "Create Project")) {
-            return MainMenuConfig.CODE_CREATE_PROJECT;
-        }
         if (groupNameMatches(context, groupName, R.string.x11_features,
             "X11功能", "X11 Functions")) {
             return MainMenuConfig.CODE_X11_FEATURES;
@@ -139,8 +135,6 @@ public class ProgramMainMenuConfig {
         switch (groupId) {
             case MainMenuConfig.CODE_COMMON_FUNCTIONS:
                 return context.getString(R.string.common_functions);
-            case MainMenuConfig.CODE_CREATE_PROJECT:
-                return context.getString(R.string.menu_create_project);
             case MainMenuConfig.CODE_X11_FEATURES:
                 return context.getString(R.string.x11_features);
             case MainMenuConfig.CODE_BEAUTIFICATION_FUNCTION:
