@@ -26,18 +26,27 @@ class UserSetManage private constructor() {
 
     public fun getZTUserBean(): ZTUserBean {
         val zTUserBeanJson = SaveData.getStringOther(ZTConstant.ZT_USER_BEAN_KEY)
-        if (zTUserBeanJson.isNullOrEmpty() || zTUserBeanJson == "def") {
-            return ZTUserBean()
-        }
-        return try {
-            Gson().fromJson(zTUserBeanJson, ZTUserBean::class.java)
-        } catch (e: Exception) {
-            e.printStackTrace()
+        val bean = if (zTUserBeanJson.isNullOrEmpty() || zTUserBeanJson == "def") {
             ZTUserBean()
+        } else {
+            try {
+                Gson().fromJson(zTUserBeanJson, ZTUserBean::class.java) ?: ZTUserBean()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                ZTUserBean()
+            }
         }
+        // 强制关闭 AI 智能体面板（用户无法再通过设置打开）
+        if (bean.isAiAgentPanelEnabled) {
+            bean.isAiAgentPanelEnabled = false
+            setZTUserBean(bean)
+        }
+        return bean
     }
 
     public fun setZTUserBean(mZTUserBean: ZTUserBean) {
+        // 强制关闭 AI 智能体面板，写入时一并压制
+        mZTUserBean.isAiAgentPanelEnabled = false
         val toJson = Gson().toJson(mZTUserBean)
         SaveData.saveStringOther(ZTConstant.ZT_USER_BEAN_KEY, toJson)
     }

@@ -1549,18 +1549,27 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         initDataMsgInfo();
         setEgInstallStatus();
         // ZeroTermux add {@
+        // 强制关闭 AI 面板：不初始化 helper，并隐藏宿主视图
         View aiPanelHost = findViewById(R.id.ai_agent_panel_host);
         View aiRunningBanner = findViewById(R.id.ai_agent_running_banner);
         if (aiPanelHost != null) {
-            mAiAgentPanelHelper = new ZtAiAgentPanelHelper(
-                aiPanelHost,
-                this,
-                () -> getDrawer().smoothClose(),
-                this::prepareAiAgentTabInDrawer,
-                // 侧栏打开时用面板内打断；关闭（含正在关闭）时用主界面顶栏
-                this::isAiDrawerEffectivelyOpen,
-                aiRunningBanner
-            );
+            if (UserSetManage.Companion.get().getZTUserBean().isAiAgentPanelEnabled()) {
+                mAiAgentPanelHelper = new ZtAiAgentPanelHelper(
+                    aiPanelHost,
+                    this,
+                    () -> getDrawer().smoothClose(),
+                    this::prepareAiAgentTabInDrawer,
+                    // 侧栏打开时用面板内打断；关闭（含正在关闭）时用主界面顶栏
+                    this::isAiDrawerEffectivelyOpen,
+                    aiRunningBanner
+                );
+            } else {
+                aiPanelHost.setVisibility(View.GONE);
+                if (aiRunningBanner != null) {
+                    aiRunningBanner.setVisibility(View.GONE);
+                }
+                mAiAgentPanelHelper = null;
+            }
         }
         // @}
     }
@@ -2944,7 +2953,11 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
             }
 
         });
-        mTerminalView.getTextSelectionCursorControllerView().setAskAiListener(this::showAiAgentPanel);
+        if (UserSetManage.Companion.get().getZTUserBean().isAiAgentPanelEnabled()) {
+            mTerminalView.getTextSelectionCursorControllerView().setAskAiListener(this::showAiAgentPanel);
+        } else {
+            mTerminalView.getTextSelectionCursorControllerView().setAskAiListener(null);
+        }
 
         mTerminalView.setActionPointer2ClickListener(() -> openToolDialog(true, 0, -1));
     }
