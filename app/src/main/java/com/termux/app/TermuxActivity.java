@@ -2459,28 +2459,29 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
     // ZeroTermux add {@
     private static final String TAG = "TermuxActivity";
     private OTGManager mOTGManager;
-    private Handler mHandler = new Handler() {
-        @SuppressLint("HandlerLeak")
+    private final Handler mHandler = new TermuxUiHandler(this);
+
+    /** 静态 Handler，避免非静态内部类持有 Activity 导致泄漏 */
+    private static final class TermuxUiHandler extends Handler {
+        private final java.lang.ref.WeakReference<TermuxActivity> mRef;
+
+        TermuxUiHandler(TermuxActivity activity) {
+            super(android.os.Looper.getMainLooper());
+            mRef = new java.lang.ref.WeakReference<>(activity);
+        }
+
         @Override
         public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            if (!false) {
-                mTerminalView.setVisibility(View.VISIBLE);
-                ZTUserBean ztUserBeanShow = UserSetManage.Companion.get().getZTUserBean();
-                ztUserBeanShow.setShowCommand(true);
-                UserSetManage.Companion.get().setZTUserBean(ztUserBeanShow);
-            } else {
-                ZTUserBean ztUserBeanShow = UserSetManage.Companion.get().getZTUserBean();
-                if (!ztUserBeanShow.isShowCommand()) {
-                    mTerminalView.setVisibility(View.INVISIBLE);
-                    double_tishi.setVisibility(View.GONE);
-                    back_color.setVisibility(View.GONE);
-                    back_img.setVisibility(View.GONE);
-                    back_video.setVisibility(View.GONE);
-                    setExtraKeysViewVisible(false);
-
-                }
+            TermuxActivity activity = mRef.get();
+            if (activity == null || activity.isFinishing()) {
+                return;
             }
+            if (activity.mTerminalView != null) {
+                activity.mTerminalView.setVisibility(View.VISIBLE);
+            }
+            ZTUserBean ztUserBeanShow = UserSetManage.Companion.get().getZTUserBean();
+            ztUserBeanShow.setShowCommand(true);
+            UserSetManage.Companion.get().setZTUserBean(ztUserBeanShow);
         }
     };
     private BroadcastReceiver messageReceiver = new BroadcastReceiver() {
@@ -3138,14 +3139,29 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
 
     private void onDestroyInit() {
         ZtForegroundActivityHolder.set(null);
-        if (SingletonCommunicationUtils.isSingletonCommunicationListenerNull) {
-            SingletonCommunicationUtils.getInstance().setSingletonCommunicationListener(null);
+        // 始终解绑：此前仅在 isNull==true 时 set(null)，逻辑反了，会长期持有 Activity 导致泄漏
+        SingletonCommunicationUtils.getInstance().setSingletonCommunicationListener(null);
+        try {
+            ZTConfig.INSTANCE.setCloseListener(null);
+        } catch (Exception ignored) {
         }
         SingletonCommunicationUtils.isSingletonCommunicationListenerNull = true;
-        unregisterReceiver(mUsbReceiver);
-        if (localBroadcastManager!= null) {
-            localBroadcastManager.unregisterReceiver(localReceiver);
-            localBroadcastManager.unregisterReceiver(messageReceiver);
+        try {
+            unregisterReceiver(mUsbReceiver);
+        } catch (Exception ignored) {
+        }
+        if (localBroadcastManager != null) {
+            try {
+                localBroadcastManager.unregisterReceiver(localReceiver);
+            } catch (Exception ignored) {
+            }
+            try {
+                localBroadcastManager.unregisterReceiver(messageReceiver);
+            } catch (Exception ignored) {
+            }
+        }
+        if (mHandler != null) {
+            mHandler.removeCallbacksAndMessages(null);
         }
         MainMenuAdapter adapter = mMainMenuAdapter;
         if (adapter != null) {
@@ -3154,7 +3170,10 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         mMainMenuAdapter = null;
         VideoUtils.getInstance().onDestroy();
         /* X11 removed */
-        MarkDownAPI.create(this).release();
+        try {
+            MarkDownAPI.create(this).release();
+        } catch (Exception ignored) {
+        }
     }
 
     @Override
