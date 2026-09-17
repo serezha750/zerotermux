@@ -60,6 +60,7 @@ public class MainMenuConfig implements BaseConfig {
     public static final int CODE_ZT_ENGINE = 6;
     public static final int CODE_ZT_CONFIG = 7;
     /** @deprecated 创建项目菜单已移除 */
+    @Deprecated
     public static final int CODE_CREATE_PROJECT = 8;
 
     private static ArrayList<MainMenuCategoryData> MAIN_MENU_CATEGORY_DATAS = new ArrayList<>();
