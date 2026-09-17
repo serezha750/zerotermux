@@ -413,11 +413,12 @@ task downloadBootstraps() {
         }
     }*/
     doLast {
-        def version = "2026.08.02-r1+apt.android-7"
-        downloadBootstrap("aarch64", "90a352db1c79aa5b6773003553d52c71da68cbe3eca2d277d0c5683d5163e658", version)
-        downloadBootstrap("arm", "f6bc4a8583166bcb38e0e74d42d6e56fd2f7401a039aa7344f0cd03701dea0bd", version)
-        downloadBootstrap("i686", "f571d8899253ee6893d349921dcef98a618c50dc0a6b503ca5994c88a23b7f44", version)
-        downloadBootstrap("x86_64", "c2d9892ff6284ada4943c0234296008098d70a73df3a419987ddd03e58af0424", version)
+        // Latest from termux-packages: bootstrap-2026.09.13-r1+apt.android-7
+        def version = "2026.09.13-r1" + "%2B" + "apt.android-7"
+        downloadBootstrap("aarch64", "dbf2805613ff2ace0b233c3b349e080bb0ff358f4ad64f4cca5966b27b93e7ee", version)
+        downloadBootstrap("arm", "ac65b4c4aa10322a9a54f8ec3e3122dec1371bef4834db4455503df0fc33f521", version)
+        downloadBootstrap("i686", "790481a60eb90dfcbaccc27113c11fa14d6820215bec7860b9a03e3417ec8277", version)
+        downloadBootstrap("x86_64", "e5b7ce18642c6769acf6cd05586170191fc98f1882ddbde6b5fb5f0b1dc253f0", version)
     }
     // @}
 }
