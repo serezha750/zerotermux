@@ -1,197 +1,106 @@
-# Contact Information
-
-Diving Group 248022558 (recommended to join first)
-Group ① 1062337587
-Group ② 885832352
-
 # ZeroTermux
 
-<div align="center">
-  <img src="https://raw.githubusercontent.com/hanxinhao000/ZeroTermux/main/img/6c5478a95ca60212eaee2f71f3e9f838_720.jpg" height="200">
-  <img src="https://raw.githubusercontent.com/hanxinhao000/ZeroTermux/main/img/95d76c74cd49693d074d2eda75d20a03_720.jpg" height="200">
-  <img height="200" alt="BC087C09330C7E37195809039DE72886" src="https://github.com/user-attachments/assets/b3805e55-0f7c-49f5-8330-f14fff9f491f" />
-</div>
-
-## X11 aar implemented via internal channel
-
-https://github.com/hanxinhao000/ZeroTermux-X11-aar
-
-# DOWNLOAD APK
-
-## If you don't want to compile it yourself, you can download the already compiled version (do not click directly, copy the address and open it in the browser address bar):
-
-https://od.ixcmstudio.cn/repository/main/ZeroTermux/
-
-## ZeroTermux signature file (shared with Utermux)
-
-https://github.com/hanxinhao000/Termux-app-UpgradedVersion/tree/master/%E7%AD%BE%E5%90%8D%E6%96%87%E4%BB%B6
-
-## Software intent
-
-ZeroTermux is a non-profit software developed based on Termux
-
-## Language
-
-Chinese English
-
-# Difference
-
-1. Backup and recovery
-2. Container switching
-3. Source function switching
-4. Linux distribution (ubuntu kali...)
-5. Other
-
-## The default source is Tsinghua source and Beijing source (need to switch manually [for domestic users, foreign users please use the official version!]) [Address](https://github.com/termux/termux-app)
-
-## After a certain level of use, it is strongly recommended that you transition to the official termux [start using after getting started] (recommended)
-
-## Original author link
-
-# [Go To](https://github.com/termux/termux-app)
-
-## Alibaba ico access link
-
-# [Go To](https://www.iconfont.cn/)
-
-# Statement
-
-| # | Statement |
-|---|-----------|
-| 1 | This software (ZeroTermux) is open source software. You may freely distribute, copy, and modify it, but you must follow the terms of the GPL license. |
-| 2 | This software is distributed under the GPL license: [http://www.opensource.org/licenses/gpl-2.0.php](http://www.opensource.org/licenses/gpl-2.0.php) |
-| 3 | All functions of this software (ZeroTermux) are intended solely for learning and communication purposes. Commercial use is prohibited. The user (anyone using ZeroTermux) bears full responsibility for any accidental, intentional, or unintentional operations performed using this software. |
-| 4 | As stated in point 1, this software (ZeroTermux) is provided free of charge for learning and communication. The icons and fonts used in the software are sourced from the internet. |
-| 4.1 | The default font is the Android system font. If you use other fonts, the user (anyone using ZeroTermux) assumes all risks and legal responsibilities. |
-| 4.2 | Icons are sourced from the Alibaba ICO public icon library. They are used for learning and communication purposes only, not for commercial use. If any copyright infringement occurs, the infringing content will be removed immediately. |
-| 5 | Recovery packages, data packages, ZIP files, etc., used with this software (ZeroTermux) carry inherent risks. All such files are sourced from the internet. Users should exercise discretion when using them. The user assumes all risk for any irreparable loss resulting from their use. |
-| 6 | ZeroTermux has no control over the content of any recovery packages, data packages, ZIP files, or module packages. If any such package contains infringing content, the author of this software bears no responsibility. Responsibility lies solely with the creator of the recovery package, data package, or ZIP package (see also the legal notice for the `tar.gz` backup function). |
-| 7 | Thanks to all authors whose work has been used in this project. |
-| 8 | Using ZeroTermux may directly or indirectly damage your device. The user assumes full responsibility for any irreparable loss. Neither this software nor its author accept any legal or other liability. |
-
-## use item:
-
-| Project | Link |
-|---------|------|
-| termux-app | https://github.com/termux/termux-app |
-| termux-tasker | https://github.com/termux/termux-tasker |
-| termux-api | https://github.com/termux/termux-api |
-| termux-styling | https://github.com/termux/termux-styling |
-| termux-packages | https://github.com/termux/termux-packages |
-| ImagePicker (Lichenwei-Dev) | https://github.com/Lichenwei-Dev/ImagePicker |
-| android-vshell | https://github.com/BryleHelll/android-vshell |
-| AgentWeb | https://github.com/Justson/AgentWeb |
-| XXPermissions | https://github.com/getActivity/XXPermissions |
-| libaums | https://github.com/magnusja/libaums |
-| ColorSeekBar | https://github.com/rtugeek/ColorSeekBar |
-| ImagePicker (jeasonlzy) | https://github.com/jeasonlzy/ImagePicker |
-| glide | https://github.com/bumptech/glide |
-| ttyd | https://github.com/tsl0922/ttyd |
-| filebrowser | https://github.com/filebrowser/filebrowser |
-| iconfont | https://www.iconfont.cn/ |
-| swiftp | https://github.com/ppareit/swiftp |
-| ImmersionBar | https://github.com/gyf-dev/ImmersionBar |
-| FNetServer | https://github.com/570622566/FNetServer |
-| codeeditor | https://github.com/testica/codeeditor |
-
-## ZeroTermux thanks all the authors cited in this project, the project presentation may not be complete, please understand.
-
----
-
-# 联系方式
-
-潜水群248022558（推荐先加）
-①群1062337587
-②群885832352
-
-# ZeroTermux
+基于 [Termux](https://github.com/termux/termux-app) 的增强版 Android 终端模拟器。
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/hanxinhao000/ZeroTermux/main/img/6c5478a95ca60212eaee2f71f3e9f838_720.jpg" height="200">
-  <img src="https://raw.githubusercontent.com/hanxinhao000/ZeroTermux/main/img/95d76c74cd49693d074d2eda75d20a03_720.jpg" height="200">
-  <img height="200" alt="BC087C09330C7E37195809039DE72886" src="https://github.com/user-attachments/assets/b3805e55-0f7c-49f5-8330-f14fff9f491f" />
+  <img src="img/6c5478a95ca60212eaee2f71f3e9f838_720.jpg" height="200" alt="screenshot">
+  <img src="img/95d76c74cd49693d074d2eda75d20a03_720.jpg" height="200" alt="screenshot">
 </div>
 
-## 内部通道实现的X11 aar
+**当前版本：`0.118.3.64`**
 
-https://github.com/hanxinhao000/ZeroTermux-X11-aar
+## 功能概览
 
-# 下载APK
+相对官方 Termux，本项目额外提供：
 
-## 不想自行编译的小伙伴可下载已经编译好的版本（不要直接点击，复制地址在浏览器地址栏打开）：
+- 备份与恢复
+- 容器切换
+- 软件源切换
+- Linux 发行版支持（Ubuntu、Kali 等）
+- 文件管理、常用工具与界面增强
 
-https://od.ixcmstudio.cn/repository/main/ZeroTermux/
+默认软件源面向国内用户（清华源 / 北京源等，可手动切换）。海外用户建议优先使用 [官方 Termux](https://github.com/termux/termux-app)。
 
-## ZeroTermux 签名文件（与Utermux共用同一个签名）
+熟悉基础操作后，也建议视需求逐步迁移到官方 Termux。
 
-https://github.com/hanxinhao000/Termux-app-UpgradedVersion/tree/master/%E7%AD%BE%E5%90%8D%E6%96%87%E4%BB%B6
+## 下载
 
-## 软件意图
+请到本仓库 **[Releases](https://github.com/serezha750/zerotermux/releases)** 下载对应架构的 APK。
 
-ZeroTermux 是根据 Termux 二次开发的一个非盈利性的软件
+常见产物命名示例：
 
-## 语言环境
+| 文件 | 说明 |
+|------|------|
+| `ZeroTermux-0.118.3.64-release_universal.apk` | 通用包 |
+| `ZeroTermux-0.118.3.64-release_arm64-v8a.apk` | ARM64 |
+| `ZeroTermux-0.118.3.64-release_armeabi-v7a.apk` | ARMv7 |
+| `ZeroTermux-0.118.3.64-release_x86.apk` / `x86_64` | 模拟器 / x86 设备 |
 
-中文 English
+也可通过 GitHub Actions 的构建产物（Artifacts）获取 Debug / Release 包。
 
-# 区别
+## 自行编译
 
-1. 备份恢复
-2. 容器切换
-3. 源功能切换
-4. Linux发行版（Ubuntu、Kali等）
-5. 等等
+### 环境要求
 
-## 默认源为清华源与北京源（需手动切换[针对国内用户，国外用户请使用官方版本！]）[地址](https://github.com/termux/termux-app)
+- JDK 17
+- Android SDK（`compileSdk 36`，见 `gradle.properties`）
+- Android NDK（版本见 `gradle.properties` 中的 `ndkVersion`）
 
-## 在使用一定程度之后，极力建议你过渡到官方Termux[入门之后开始使用]（推荐）
+### 构建命令
 
-## 原作者链接
+```bash
+chmod +x gradlew
+./gradlew :app:assembleDebug
+./gradlew :app:assembleRelease
+```
 
-# [点击访问](https://github.com/termux/termux-app)
+输出目录：
 
-## 阿里巴巴ICO访问链接
+```text
+app/build/outputs/apk/debug/
+app/build/outputs/apk/release/
+```
 
-# [点击访问](https://www.iconfont.cn/)
+签名相关配置见 `app/build.gradle` 中的 `signingConfigs`（可通过环境变量 `KEY_ALIAS`、`KEY_PASSWORD`、`STORE_PASSWORD` 覆盖）。
 
-# 声明
+### CI
 
-| # | 声明 |
-|---|------|
-| 1 | 本软件（ZeroTermux）为开源软件，你可以自由分发、复制、更改，但请遵循GPL协议！ |
-| 2 | 软件遵循GPL协议（http://www.opensource.org/licenses/gpl-2.0.php） |
-| 3 | 本软件（ZeroTermux）的所有功能均为学习交流使用，切勿商用。如用户（使用ZeroTermux的用户）的意外操作、有意操作、无意操作等由用户承担！ |
-| 4 | 本软件（ZeroTermux）与第一条一样为免费学习交流使用，软件内涉及的图标以及字体均来源于互联网。 |
-| 4.1 | 字体为Android默认字体，如使用其他字体请用户（使用ZeroTermux的用户）承担所有风险以及法律责任。 |
-| 4.2 | 图标使用为阿里巴巴ICO公用图库，使用该图标的原则是学习与交流，并非商用，如有侵权立即删除。 |
-| 5 | 在本软件（ZeroTermux）内使用的恢复包、数据包、zip包等都有使用风险，且全部都来源于互联网，请用户酌情使用，如有造成无法挽回的损失，请用户承担风险。 |
-| 6 | 所有恢复包、数据包、zip包、模块包，ZeroTermux不能控制其内容，如有包内侵权本软件作者不承担任何责任，均由恢复包、数据包、zip包制作者承担（tar.gz备份功能法律声明）。 |
-| 7 | 感谢所有该项目所应用到功能的作者。 |
-| 8 | 使用ZeroTermux会直接或间接损害你的设备，如有造成无法挽回的损失由用户承担，本软件以及作者不承担任何法律等责任。 |
+推送到 `main` 或手动触发 **CI** 工作流，会按架构矩阵编译 Debug / Release APK 并上传 Artifacts。
 
-## 使用项目：
+## 语言
+
+界面与文档主要支持 **中文** 与 **英文**。
+
+## 上游与致谢
+
+本项目基于并使用了以下开源工作（不完全列表）：
 
 | 项目 | 链接 |
 |------|------|
 | termux-app | https://github.com/termux/termux-app |
-| termux-tasker | https://github.com/termux/termux-tasker |
+| termux-packages | https://github.com/termux/termux-packages |
 | termux-api | https://github.com/termux/termux-api |
 | termux-styling | https://github.com/termux/termux-styling |
-| termux-packages | https://github.com/termux/termux-packages |
-| ImagePicker (Lichenwei-Dev) | https://github.com/Lichenwei-Dev/ImagePicker |
-| android-vshell | https://github.com/BryleHelll/android-vshell |
+| termux-tasker | https://github.com/termux/termux-tasker |
 | AgentWeb | https://github.com/Justson/AgentWeb |
 | XXPermissions | https://github.com/getActivity/XXPermissions |
 | libaums | https://github.com/magnusja/libaums |
-| ColorSeekBar | https://github.com/rtugeek/ColorSeekBar |
-| ImagePicker (jeasonlzy) | https://github.com/jeasonlzy/ImagePicker |
 | glide | https://github.com/bumptech/glide |
+| ImmersionBar | https://github.com/gyf-dev/ImmersionBar |
 | ttyd | https://github.com/tsl0922/ttyd |
 | filebrowser | https://github.com/filebrowser/filebrowser |
-| iconfont | https://www.iconfont.cn/ |
-| swiftp | https://github.com/ppareit/swiftp |
-| ImmersionBar | https://github.com/gyf-dev/ImmersionBar |
-| FNetServer | https://github.com/570622566/FNetServer |
-| codeeditor | https://github.com/testica/codeeditor |
 
-## ZeroTermux鸣谢所有在此项目当中引用的作者，项目展示可能不完全，请谅解。
+更多许可说明见 [LICENSE.md](LICENSE.md)。
+
+## 声明
+
+1. ZeroTermux 为开源软件，遵循 GPL 许可条款分发与修改。详见 [LICENSE.md](LICENSE.md) 与 [GPLv3](https://www.gnu.org/licenses/gpl-3.0.html)。
+2. 本软件功能仅供学习与交流，使用者须自行承担使用风险。
+3. 备份包、数据包、zip/模块等第三方内容来源不一，请自行甄别；因使用此类内容造成的损失由使用者自行承担。
+4. 使用本软件可能对设备造成影响，作者与项目不对任何直接或间接损失承担责任。
+
+## 相关资源
+
+- 官方 Termux：https://github.com/termux/termux-app
+- X11 相关实现参考：https://github.com/hanxinhao000/ZeroTermux-X11-aar
+
