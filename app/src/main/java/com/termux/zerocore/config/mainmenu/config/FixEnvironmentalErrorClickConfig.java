@@ -17,7 +17,7 @@ public class FixEnvironmentalErrorClickConfig extends BaseMenuClickConfig {
 
     @Override
     public Drawable getIcon(Context context) {
-        return context.getDrawable(R.mipmap.warning);
+        return context.getDrawable(R.mipmap.chongzhi_ico);
     }
 
     @Override
