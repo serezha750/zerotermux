@@ -190,7 +190,7 @@
     <string name="切换源">Mirrors</string>
     <string name="容器切换">Containers</string>
     <string name="备份恢复">Backup</string>
-    <string name="发行版本">Distro</string>
+    <string name="发行版本">proot-distro</string>
     <string name="QEMU">QEMU</string>
     <string name="命令定义">Commands</string>
     <string name="短信通话">SMS/Call</string>

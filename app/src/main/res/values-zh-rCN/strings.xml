@@ -175,7 +175,7 @@
     <string name="切换源">切换源</string>
     <string name="容器切换">容器切换</string>
     <string name="备份恢复">备份/恢复</string>
-    <string name="发行版本">发行版本</string>
+    <string name="发行版本">proot-distro</string>
     <string name="QEMU">QEMU</string>
     <string name="命令定义">命令定义</string>
     <string name="短信通话">短信/通话</string>
