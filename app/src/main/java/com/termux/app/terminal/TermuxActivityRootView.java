@@ -299,10 +299,7 @@ public class TermuxActivityRootView extends ZeroTermuxBackLayout implements View
     public VideoView getBack_video() {
         return getBackVideo();
     }
-    /** X11 已移除，兼容旧调用。 */
-    public com.termux.x11.MainActivity getMainActivity() {
-        return null;
-    }
+
 	// @}
 
 }

@@ -9,7 +9,6 @@ import android.widget.VideoView;
 
 import com.example.xh_lib.utils.UUtils;
 import com.termux.R;
-import com.termux.x11.MainActivity;
 
 public class ZeroTermuxBackLayout extends RelativeLayout {
     private View mBackgroundRoot;
@@ -45,10 +44,6 @@ public class ZeroTermuxBackLayout extends RelativeLayout {
         addView(viewLay);
     }
 
-    public void applyX11SystemInsets(android.app.Activity activity) {
-        // no-op
-    }
-
     public View getBackColor() {
         return back_color;
     }
@@ -59,9 +54,5 @@ public class ZeroTermuxBackLayout extends RelativeLayout {
 
     public VideoView getBackVideo() {
         return back_video;
-    }
-
-    public MainActivity getMainActivity() {
-        return null;
     }
 }

@@ -9,7 +9,6 @@ import android.view.View;
 import com.example.xh_lib.utils.UUtils;
 import com.termux.R;
 import com.termux.app.TermuxActivity;
-import com.termux.x11.MainActivity;
 import com.termux.zerocore.bean.ZTUserBean;
 import com.termux.zerocore.ftp.utils.UserSetManage;
 

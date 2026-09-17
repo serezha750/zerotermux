@@ -106,7 +106,6 @@ import com.termux.terminal.TerminalSessionClient;
 import com.termux.view.TerminalRenderer;
 import com.termux.view.TerminalView;
 import com.termux.view.TerminalViewClient;
-import com.termux.x11.MainActivity;
 import com.termux.zerocore.activity.EditTextActivity;
 import com.termux.zerocore.background.FireworkView;
 import com.termux.zerocore.bean.EditPromptBean;
@@ -299,7 +298,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
 	// ZeroTermux modify {@
 	//  private float mTerminalToolbarDefaultHeight;
     private int mTerminalToolbarDefaultHeight;
-    public boolean mInternalPassage;
+    public boolean mInternalPassage = false; // X11 已移除
 	// @}
 
 
@@ -1131,7 +1130,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         if (!bean.isShowCommand()) {
             return;
         }
-        if (mInternalPassage && !MainActivity.isConnected()) {
+        if (mInternalPassage && !false) {
             back_color.setVisibility(View.INVISIBLE);
             return;
         }
@@ -1415,7 +1414,6 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
     private View back_color;
     private ImageView back_img;
     private VideoView back_video;
-    private MainActivity mMainActivity;
     private FrameLayout frame_file;
     private RelativeLayout session_rl;
     private RelativeLayout mGuideLayout;
@@ -1481,7 +1479,6 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         back_color = mTermuxActivityRootView.getBack_color();
         back_img = mTermuxActivityRootView.getBack_img();
         back_video = mTermuxActivityRootView.getBack_video();
-        mMainActivity = mTermuxActivityRootView.getMainActivity();
         qq_group_tv.setOnClickListener(this);
         mKeyBordButton.setOnClickListener(v -> {
             showKeyBord();
@@ -1746,15 +1743,15 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
     }
 
     public void x11KeyboardGone() {
-        if (MainActivity.isConnected()) {
-            mMainActivity.setTerminalToolbarViewVisible(false);
+        if (false) {
+
         } else {
             UUtils.showMsg(getString(R.string.x11_not_connect));
         }
     }
     public void x11KeyboardVisible() {
-        if (MainActivity.isConnected()) {
-            mMainActivity.setTerminalToolbarViewVisible(true);
+        if (false) {
+
         } else {
             UUtils.showMsg(getString(R.string.x11_not_connect));
         }
@@ -1762,13 +1759,11 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
     public void showTermuxView() {
         ZTUserBean ztUserBeanShow = UserSetManage.Companion.get().getZTUserBean();
         ztUserBeanShow.setShowCommand(true);
-        if (MainActivity.isConnected()) {
+        if (false) {
             mTerminalView.setVisibility(View.VISIBLE);
             double_tishi.setVisibility(View.VISIBLE);
             setExtraKeysViewVisible(true);
-            if (mMainActivity != null) {
-                mMainActivity.setTerminalToolbarViewVisible(false);
-            }
+
             setSummaryVisible();
             initColorConfig();
             back_color.setVisibility(View.VISIBLE);
@@ -1782,18 +1777,16 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         }
         UserSetManage.Companion.get().setZTUserBean(ztUserBeanShow);
         if (mInternalPassage) {
-            scheduleApplyX11SystemInsets();
+            // X11 removed
         }
     }
     public void hideTermuxView() {
         ZTUserBean ztUserBeanHide = UserSetManage.Companion.get().getZTUserBean();
         ztUserBeanHide.setShowCommand(false);
-        if (MainActivity.isConnected()) {
+        if (false) {
             mTerminalView.setVisibility(View.INVISIBLE);
             setExtraKeysViewVisible(false);
-            if (mMainActivity != null) {
-                mMainActivity.setTerminalToolbarViewVisible(true);
-            }
+
             double_tishi.setVisibility(View.GONE);
             back_color.setVisibility(View.GONE);
             back_img.setVisibility(View.GONE);
@@ -1809,7 +1802,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
 
         UserSetManage.Companion.get().setZTUserBean(ztUserBeanHide);
         if (mInternalPassage) {
-            scheduleApplyX11SystemInsets();
+            // X11 removed
         }
     }
 
@@ -1819,9 +1812,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         super.onPause();
         VideoUtils.getInstance().pause();
         getDrawer().smoothClose();
-        if(mInternalPassage && mMainActivity != null) {
-            mMainActivity.onPause();
-        }
+        /* X11 removed */
     }
 
     private SwitchDialog switchDialogShow(String title, String msg) {
@@ -2306,12 +2297,12 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         }
         ZTUserBean ztUserBean = UserSetManage.Companion.get().getZTUserBean();
         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-            if (!ztUserBean.isResetVolume() || MainActivity.isConnected()) {
+            if (!ztUserBean.isResetVolume() || false) {
                 openRightSideOrAiPanel();
                 return true;
             }
         } else if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-            if (!ztUserBean.isResetVolume() || MainActivity.isConnected()) {
+            if (!ztUserBean.isResetVolume() || false) {
                 if (getDrawer().isOpened()) {
                     getDrawer().smoothClose();
                 } else {
@@ -2475,7 +2466,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            if (!MainActivity.isConnected()) {
+            if (!false) {
                 mTerminalView.setVisibility(View.VISIBLE);
                 ZTUserBean ztUserBeanShow = UserSetManage.Companion.get().getZTUserBean();
                 ztUserBeanShow.setShowCommand(true);
@@ -2489,9 +2480,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
                     back_img.setVisibility(View.GONE);
                     back_video.setVisibility(View.GONE);
                     setExtraKeysViewVisible(false);
-                    if (mMainActivity != null) {
-                        mMainActivity.setTerminalToolbarViewVisible(true);
-                    }
+
                 }
             }
         }
@@ -2818,7 +2807,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
     }
 
     private void initZeroTermux() {
-        mInternalPassage = UserSetManage.Companion.get().getZTUserBean().isInternalPassage();
+        mInternalPassage = false; // X11 已移除
         initSmartSwipe();
         mOTGManager = new OTGManager();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -2834,11 +2823,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         initListener();
         initStatusBarHeight();
         initMenu();
-        if(mInternalPassage && mMainActivity != null) {
-            mMainActivity.init();
-            regMainViewKeyDown();
-            scheduleApplyX11SystemInsets();
-        }
+        /* X11 removed */
         try {
             startService(new Intent(this, ZTSocketService.class));
         } catch (Exception e) {
@@ -2852,14 +2837,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         SingletonCommunicationUtils.getInstance().setSingletonCommunicationListener(this);
     }
 	// ZeroTermux add {@
-    private void scheduleApplyX11SystemInsets() {
-        if (!mInternalPassage || mTermuxActivityRootView == null) {
-            return;
-        }
-        Runnable apply = () -> mTermuxActivityRootView.applyX11SystemInsets(TermuxActivity.this);
-        mTermuxActivityRootView.post(apply);
-        mTermuxActivityRootView.postDelayed(apply, 200);
-    }
+
 
     private void initStatusBarHeight() {
         int statusBarHeight = UUtils.getStatusBarHeight(this);
@@ -2985,33 +2963,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
     }
     // ZeroTermux add {@
     private void regMainViewKeyDown() {
-        if (mMainActivity != null) {
-            mMainActivity.setMainActivityOnKeyDown((keyCode, keyEvent) -> {
-                Log.i(TAG, "handleKey keyCode termux: " + keyCode);
-                ZTUserBean bean = UserSetManage.Companion.get().getZTUserBean();
-                if (bean.isResetVolume()) {
-                    return false;
-                }
-                Log.i(TAG, "handleKey keyCode getDrawer().isOpened(): " + getDrawer().isOpened());
-                if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-                    openRightSideOrAiPanel();
-                } else if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-                    if (!bean.isResetVolume()) {
-                        if (getDrawer().isOpened()) {
-                            getDrawer().smoothClose();
-                        } else {
-                            getDrawer().smoothLeftOpen();
-                        }
-                    }
-                } else if (keyCode == KeyEvent.FLAG_KEEP_TOUCH_MODE) {
-                    finish();
-                }
-                return true;
-            });
-            if (mInternalPassage) {
-                mMainActivity.setSettingsClick(() -> startActivity(new Intent(TermuxActivity.this, ZtSettingsActivity.class)));
-            }
-        }
+        // X11 内部通道已移除，音量键等由系统默认处理
     }
     // @}
     private LoadingDialog mLoadingDialog;
@@ -3158,10 +3110,8 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         ZtForegroundActivityHolder.set(this);
         VideoUtils.getInstance().onResume();
         initUserData();
-        if (mInternalPassage && mMainActivity != null) {
-            mMainActivity.onResume();
-        }
-        scheduleApplyX11SystemInsets();
+        /* X11 removed */
+        // X11 removed
         ZtBeautifyUiEffects.syncBeautifyUiFromBean(this);
         // @}
         IntentFilter filter = new IntentFilter();
@@ -3205,31 +3155,23 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         }
         mMainMenuAdapter = null;
         VideoUtils.getInstance().onDestroy();
-        if (mInternalPassage && mMainActivity != null) {
-            mMainActivity.onDestroy(this);
-        }
+        /* X11 removed */
         MarkDownAPI.create(this).release();
     }
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (mInternalPassage && mMainActivity != null) {
-            mMainActivity.onWindowFocusChanged(hasFocus);
-        }
-        if (hasFocus && mInternalPassage) {
-            scheduleApplyX11SystemInsets();
-        }
+        /* X11 removed */
+        
     }
 
 
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if (mInternalPassage && mMainActivity != null) {
-            mMainActivity.onConfigurationChanged(newConfig);
-        }
-        scheduleApplyX11SystemInsets();
+        /* X11 removed */
+        // X11 removed
     }
 
     private void onActivityResultZtInit(int requestCode, int resultCode, @Nullable Intent data) {
