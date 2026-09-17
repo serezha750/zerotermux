@@ -262,6 +262,9 @@ public final class TerminalEmulator {
      */
     private int mScrollCounter = 0;
 
+    /** Cached TerminalView.mTopRow for session switches (termux-app 74ab512). */
+    private int mTopRow;
+
     /** If automatic scrolling of terminal is disabled */
     private boolean mAutoScrollDisabled;
 
@@ -2533,6 +2536,14 @@ public final class TerminalEmulator {
         mAutoScrollDisabled = !mAutoScrollDisabled;
     }
 
+
+    public int getTopRow() {
+        return mTopRow;
+    }
+
+    public void setTopRow(int topRow) {
+        mTopRow = topRow;
+    }
 
     /** Reset terminal state so user can interact with it regardless of present state. */
     public void reset() {

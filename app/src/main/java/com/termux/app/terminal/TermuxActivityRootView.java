@@ -136,6 +136,19 @@ public class TermuxActivityRootView extends ZeroTermuxBackLayout implements View
             Logger.logVerbose(LOG_TAG, ":\nonGlobalLayout:");
 
         FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) getLayoutParams();
+        // Skip in multi/floating window mode as the soft keyboard is detached from
+        // the app window and wrong calculations may cause flicker. (termux-app 4584488)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N &&
+            mActivity != null && mActivity.isInMultiWindowMode()) {
+            if (params.bottomMargin != 0) {
+                params.setMargins(0, 0, 0, 0);
+                setLayoutParams(params);
+            }
+            marginBottom = null;
+            lastMarginBottom = null;
+            return;
+        }
+
 
         // Get the position Rects of the bottom space view and the main window holding it
         Rect[] windowAndViewRects = ViewUtils.getWindowAndViewRects(bottomSpaceView, mStatusBarHeight);

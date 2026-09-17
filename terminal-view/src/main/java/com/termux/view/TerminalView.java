@@ -297,11 +297,13 @@ public final class TerminalView extends View {
      */
     public boolean attachSession(TerminalSession session) {
         if (session == mTermSession) return false;
-        mTopRow = 0;
 
         mTermSession = session;
         mEmulator = null;
         mCombiningAccent = 0;
+
+        // Emulator cached top row will be read in updateSize() when emulator is set. (74ab512)
+        setTopRow(0, false);
 
         updateSize();
 
@@ -819,6 +821,8 @@ public final class TerminalView extends View {
             return true;
         } else if (keyCode == KeyEvent.KEYCODE_LANGUAGE_SWITCH) {
             return super.onKeyDown(keyCode, event);
+        } else if (keyCode == KeyEvent.KEYCODE_LANGUAGE_SWITCH) {
+            return super.onKeyDown(keyCode, event);
         }
 
         final int metaState = event.getMetaState();
@@ -1034,7 +1038,12 @@ public final class TerminalView extends View {
             if (mTerminalCursorBlinkerRunnable != null)
                 mTerminalCursorBlinkerRunnable.setEmulator(mEmulator);
 
-            mTopRow = 0;
+            // Restore scroll position from emulator cache (termux-app 74ab512)
+            int top = mEmulator.getTopRow();
+            int minTop = -mEmulator.getScreen().getActiveTranscriptRows();
+            if (top < minTop) top = minTop;
+            if (top > 0) top = 0;
+            setTopRow(top, false);
             scrollTo(0, 0);
             invalidate();
         }
@@ -1089,8 +1098,16 @@ public final class TerminalView extends View {
         return mTopRow;
     }
 
-    public void setTopRow(int mTopRow) {
-        this.mTopRow = mTopRow;
+    public void setTopRow(int topRow) {
+        setTopRow(topRow, true);
+    }
+
+    /** @param updateEmulator if true, also store on current emulator for session switches */
+    public void setTopRow(int topRow, boolean updateEmulator) {
+        this.mTopRow = topRow;
+        if (updateEmulator && mEmulator != null) {
+            mEmulator.setTopRow(topRow);
+        }
     }
 
 

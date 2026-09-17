@@ -173,6 +173,10 @@ public class TermuxOpenReceiver extends BroadcastReceiver {
         @Override
         public String getType(@NonNull Uri uri) {
             String path = uri.getLastPathSegment();
+            // path may be null if Uri has no last segment (e.g. content://com.termux.files/)
+            if (path == null) {
+                return null;
+            }
             int extIndex = path.lastIndexOf('.') + 1;
             if (extIndex > 0) {
                 MimeTypeMap mimeMap = MimeTypeMap.getSingleton();
