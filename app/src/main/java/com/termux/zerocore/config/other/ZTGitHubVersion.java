@@ -213,7 +213,7 @@ public class ZTGitHubVersion {
 
     /**
      * 抽出可比较的数字版本：
-     * ZeroTermux-0.118.3.64 / v0.118.3.64 / 0.118.3.64 → 0.118.3.64
+     * ZeroTermux-0.118.3.65 / v0.118.3.65 / 0.118.3.65 → 0.118.3.65
      */
     static String normalizeVersion(String raw) {
         if (TextUtils.isEmpty(raw)) {

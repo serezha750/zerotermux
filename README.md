@@ -7,7 +7,7 @@
   <img src="img/95d76c74cd49693d074d2eda75d20a03_720.jpg" height="200" alt="screenshot">
 </div>
 
-**当前版本：`0.118.3.64`**
+**当前版本：`0.118.3.65`**
 
 ## 功能概览
 
@@ -31,10 +31,10 @@
 
 | 文件 | 说明 |
 |------|------|
-| `ZeroTermux-0.118.3.64-release_universal.apk` | 通用包 |
-| `ZeroTermux-0.118.3.64-release_arm64-v8a.apk` | ARM64 |
-| `ZeroTermux-0.118.3.64-release_armeabi-v7a.apk` | ARMv7 |
-| `ZeroTermux-0.118.3.64-release_x86.apk` / `x86_64` | 模拟器 / x86 设备 |
+| `ZeroTermux-0.118.3.65-release_universal.apk` | 通用包 |
+| `ZeroTermux-0.118.3.65-release_arm64-v8a.apk` | ARM64 |
+| `ZeroTermux-0.118.3.65-release_armeabi-v7a.apk` | ARMv7 |
+| `ZeroTermux-0.118.3.65-release_x86.apk` / `x86_64` | 模拟器 / x86 设备 |
 
 也可通过 GitHub Actions 的构建产物（Artifacts）获取 Debug / Release 包。
 
