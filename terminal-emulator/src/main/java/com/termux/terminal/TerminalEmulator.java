@@ -91,8 +91,12 @@ public final class TerminalEmulator {
     /** The number of parameter arguments including colon separated sub-parameters. */
     private static final int MAX_ESCAPE_PARAMETERS = 32;
 
-    /** Needs to be large enough to contain reasonable OSC 52 pastes. */
-    private static final int MAX_OSC_STRING_LENGTH = 8192;
+    /**
+     * Needs to be large enough for OSC 52 clipboard pastes.
+     * Android binder has ~100KB limit for UTF-16 String transactions (clipboard);
+     * +10 for the {@code 52;Pc;} prefix. (termux-app d8d6b02)
+     */
+    private static final int MAX_OSC_STRING_LENGTH = (100 * 1024) + 10;
 
     /** DECSET 1 - application cursor keys. */
     private static final int DECSET_BIT_APPLICATION_CURSOR_KEYS = 1;
@@ -2110,10 +2114,10 @@ public final class TerminalEmulator {
             case 52: // Manipulate Selection Data. Skip the optional first selection parameter(s).
                 int startIndex = textParameter.indexOf(";") + 1;
                 try {
-                    String clipboardText = new String(Base64.decode(textParameter.substring(startIndex), 0), StandardCharsets.UTF_8);
+                    String clipboardText = new String(Base64.decode(textParameter.substring(startIndex), Base64.DEFAULT), StandardCharsets.UTF_8);
                     mSession.onCopyTextToClipboard(clipboardText);
                 } catch (Exception e) {
-                    Logger.logError(mClient, LOG_TAG, "OSC Manipulate selection, invalid string '" + textParameter + "");
+                    Logger.logError(mClient, LOG_TAG, "OSC Manipulate selection, invalid string '" + textParameter + "'");
                 }
                 break;
             case 104:
