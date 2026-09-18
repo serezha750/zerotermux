@@ -348,6 +348,10 @@ class EditTextActivity : AppCompatActivity() {
     private var sidebarSearchAdapter: ArrayAdapter<String>? = null
 
     private val fileTreeNodes = ArrayList<FileTreeNode>()
+    /** 文件树异步构建代数，丢弃过期结果 */
+    private var fileTreeBuildGeneration = 0
+    /** 打开文件请求代数 */
+    private var openFileRequestId = 0
     private val fileTreeItems = ArrayList<String>()
     private val expandedDirectories = LinkedHashSet<String>()
     private var fileTreeAdapter: ArrayAdapter<String>? = null
@@ -2196,16 +2200,67 @@ class EditTextActivity : AppCompatActivity() {
     }
 
     private fun loadFile(file: File, storeCurrent: Boolean = true) {
-        if (!canOpenFile(file)) return
+        if (!file.isFile) return
         lspSymbolPopup?.dismiss()
         clearLspReferenceHighlight()
         if (storeCurrent) storeCurrentTabState()
+
+        val absolutePath = file.absolutePath
+        editorTabs.firstOrNull { it.file.absolutePath == absolutePath }?.let { tab ->
+            applyOpenedTab(tab)
+            return
+        }
+
+        val extension = getFileExtension(file)
+        if (isBitmapImageFile(extension)) {
+            if (!canOpenFile(file)) return
+            val tab = EditorTab(file, "", "", previewOnly = true, svgPreviewMode = true)
+            editorTabs.add(tab)
+            applyOpenedTab(tab)
+            return
+        }
+
+        val requestId = ++openFileRequestId
+        editorBackground {
+            // 未知扩展名时在 IO 线程做文本嗅探，避免主线程读盘
+            val allowed = isBitmapImageFile(extension) || isSvgFile(extension) || isLikelyTextFile(file, extension)
+            if (!allowed) {
+                editorOnMain {
+                    if (requestId != openFileRequestId) return@editorOnMain
+                    UUtils.showMsg(getString(R.string.editor_file_not_text))
+                }
+                return@editorBackground
+            }
+            val content = runCatching { file.readText() }.getOrElse { err ->
+                editorOnMain {
+                    if (requestId != openFileRequestId) return@editorOnMain
+                    UUtils.showMsg(err.message ?: UUtils.getString(R.string.save_error_))
+                }
+                return@editorBackground
+            }
+            editorOnMain {
+                if (requestId != openFileRequestId || isFinishing || isDestroyed) return@editorOnMain
+                // 期间可能已被其它路径打开
+                editorTabs.firstOrNull { it.file.absolutePath == absolutePath }?.let {
+                    applyOpenedTab(it)
+                    return@editorOnMain
+                }
+                val tab = if (isSvgFile(extension)) {
+                    EditorTab(file, content, content, svgPreviewMode = true)
+                } else {
+                    EditorTab(file, content, content)
+                }
+                editorTabs.add(tab)
+                applyOpenedTab(tab)
+            }
+        }
+    }
+
+    private fun applyOpenedTab(tab: EditorTab) {
         try {
-            val tab = findOrCreateTab(file)
             currentFile = tab.file
             isDirty = tab.dirty
-            val extension = getFileExtension(file)
-            Log.i(TAG, "onCreatexxxxxx extension2: $extension")
+            val extension = getFileExtension(tab.file)
             if (tab.previewOnly || isTextPreviewMode(tab)) {
                 showPreviewTab(tab)
             } else {
@@ -2227,14 +2282,15 @@ class EditTextActivity : AppCompatActivity() {
         val absolutePath = file.absolutePath
         editorTabs.firstOrNull { it.file.absolutePath == absolutePath }?.let { return it }
         val extension = getFileExtension(file)
+        // 同步路径仅用于已缓存或极小场景；大文件打开走 loadFile 异步
         return when {
             isBitmapImageFile(extension) -> EditorTab(file, "", "", previewOnly = true, svgPreviewMode = true)
             isSvgFile(extension) -> {
-                val content = file.readText()
+                val content = runCatching { file.readText() }.getOrDefault("")
                 EditorTab(file, content, content, svgPreviewMode = true)
             }
             else -> {
-                val content = file.readText()
+                val content = runCatching { file.readText() }.getOrDefault("")
                 EditorTab(file, content, content)
             }
         }.also {
@@ -4212,36 +4268,59 @@ class EditTextActivity : AppCompatActivity() {
     }
 
     private fun refreshFileTree() {
-        fileTreeNodes.clear()
-        fileTreeItems.clear()
         val root = fileTreeRoot
         if (root == null || !root.isDirectory) {
+            fileTreeNodes.clear()
+            fileTreeItems.clear()
             fileTreeItems.add(getString(R.string.editor_sidebar_file_empty))
             fileTreeAdapter?.notifyDataSetChanged()
             scheduleFileTreeContentWidthUpdate()
             return
         }
+        val goUpLabel = getString(R.string.editor_sidebar_go_up)
+        val newMenuLabel = getString(R.string.editor_sidebar_new_menu)
         val parent = root.parentFile
-        if (parent != null && parent.isDirectory) {
-            fileTreeNodes.add(FileTreeNode(FileTreeEntryKind.GO_UP, parent, 0))
-            fileTreeItems.add(getString(R.string.editor_sidebar_go_up))
+        val expandedSnapshot = HashSet(expandedDirectories)
+        val generation = ++fileTreeBuildGeneration
+        editorBackground {
+            val nodes = ArrayList<FileTreeNode>()
+            val items = ArrayList<String>()
+            if (parent != null && parent.isDirectory) {
+                nodes.add(FileTreeNode(FileTreeEntryKind.GO_UP, parent, 0))
+                items.add(goUpLabel)
+            }
+            nodes.add(FileTreeNode(FileTreeEntryKind.NEW_MENU, root, 0))
+            items.add(newMenuLabel)
+            addFileTreeChildrenTo(nodes, items, root, 0, expandedSnapshot)
+            editorOnMain {
+                if (generation != fileTreeBuildGeneration || isFinishing || isDestroyed) return@editorOnMain
+                fileTreeNodes.clear()
+                fileTreeNodes.addAll(nodes)
+                fileTreeItems.clear()
+                fileTreeItems.addAll(items)
+                fileTreeAdapter?.notifyDataSetChanged()
+                scheduleFileTreeContentWidthUpdate()
+            }
         }
-        fileTreeNodes.add(FileTreeNode(FileTreeEntryKind.NEW_MENU, root, 0))
-        fileTreeItems.add(getString(R.string.editor_sidebar_new_menu))
-        addFileTreeChildren(root, 0)
-        fileTreeAdapter?.notifyDataSetChanged()
-        scheduleFileTreeContentWidthUpdate()
     }
 
-    private fun addFileTreeChildren(directory: File, depth: Int) {
-        if (fileTreeNodes.size >= MAX_FILE_TREE_ITEMS) return
-        val files = directory.listFiles()?.sortedWith(compareBy<File> { !it.isDirectory }.thenBy { it.name.lowercase(Locale.ROOT) }) ?: return
+    private fun addFileTreeChildrenTo(
+        nodes: ArrayList<FileTreeNode>,
+        items: ArrayList<String>,
+        directory: File,
+        depth: Int,
+        expanded: Set<String>
+    ) {
+        if (nodes.size >= MAX_FILE_TREE_ITEMS) return
+        val files = directory.listFiles()?.sortedWith(
+            compareBy<File> { !it.isDirectory }.thenBy { it.name.lowercase(Locale.ROOT) }
+        ) ?: return
         for (file in files) {
-            if (fileTreeNodes.size >= MAX_FILE_TREE_ITEMS) return
-            fileTreeNodes.add(FileTreeNode(FileTreeEntryKind.NORMAL, file, depth))
-            fileTreeItems.add(formatFileTreeItem(file))
-            if (file.isDirectory && expandedDirectories.contains(file.absolutePath)) {
-                addFileTreeChildren(file, depth + 1)
+            if (nodes.size >= MAX_FILE_TREE_ITEMS) return
+            nodes.add(FileTreeNode(FileTreeEntryKind.NORMAL, file, depth))
+            items.add(formatFileTreeItem(file))
+            if (file.isDirectory && expanded.contains(file.absolutePath)) {
+                addFileTreeChildrenTo(nodes, items, file, depth + 1, expanded)
             }
         }
     }
