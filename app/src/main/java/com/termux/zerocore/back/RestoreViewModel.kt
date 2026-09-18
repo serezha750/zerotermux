@@ -46,41 +46,48 @@ class RestoreViewModel {
     }
 
     private fun initAdapter() {
-        val xinHaoDataPathFile = FileIOUtils.getXinHaoDataPathFile()
-        val listFiles = xinHaoDataPathFile.listFiles()
-        if (listFiles != null && listFiles.isNotEmpty()) {
-            isShowData(false)
-            var mArrayList: ArrayList<DataBean> = ArrayList()
-            listFiles.forEach {
-                var mDataBean = DataBean()
+        GlobalScope.launch(Dispatchers.IO) {
+            val listFiles = FileIOUtils.getXinHaoDataPathFile().listFiles()
+            val mArrayList: ArrayList<DataBean> = ArrayList()
+            listFiles?.forEach {
+                val mDataBean = DataBean()
                 mDataBean.mFile = it
                 mArrayList.add(mDataBean)
             }
-            val restoreAdapter = RestoreAdapter(mArrayList, mContext!!)
-            mRestoreList?.let {
-                it.layoutManager = LinearLayoutManager(mContext)
-                it.adapter = restoreAdapter
-            }
-            restoreAdapter.setRestoreRefreshFileListener(object : RestoreRefreshFileListener{
-                override fun refresh() {
-                    val refreshXinHaoDataPathFile = FileIOUtils.getXinHaoDataPathFile()
-                    val refreshListFiles = refreshXinHaoDataPathFile.listFiles()
-                    if (refreshListFiles != null && refreshListFiles.isNotEmpty()) {
-                        isShowData(false)
-                        var mRefreshArrayList: ArrayList<DataBean> = ArrayList()
-                        refreshListFiles.forEach {
-                            var mDataBean = DataBean()
-                            mDataBean.mFile = it
-                            mRefreshArrayList.add(mDataBean)
-                        }
-                        restoreAdapter.setList(mRefreshArrayList)
-                        restoreAdapter.notifyDataSetChanged()
-                    } else {
-                        isShowData(true)
-                    }
+            withContext(Dispatchers.Main) {
+                val ctx = mContext ?: return@withContext
+                if (mArrayList.isEmpty()) {
+                    isShowData(true)
+                    return@withContext
                 }
-
-            })
+                isShowData(false)
+                val restoreAdapter = RestoreAdapter(mArrayList, ctx)
+                mRestoreList?.let {
+                    it.layoutManager = LinearLayoutManager(ctx)
+                    it.adapter = restoreAdapter
+                }
+                restoreAdapter.setRestoreRefreshFileListener(object : RestoreRefreshFileListener {
+                    override fun refresh() {
+                        GlobalScope.launch(Dispatchers.IO) {
+                            val refreshListFiles = FileIOUtils.getXinHaoDataPathFile().listFiles()
+                            val mRefreshArrayList: ArrayList<DataBean> = ArrayList()
+                            refreshListFiles?.forEach {
+                                val mDataBean = DataBean()
+                                mDataBean.mFile = it
+                                mRefreshArrayList.add(mDataBean)
+                            }
+                            withContext(Dispatchers.Main) {
+                                if (mRefreshArrayList.isEmpty()) {
+                                    isShowData(true)
+                                } else {
+                                    isShowData(false)
+                                    restoreAdapter.setList(mRefreshArrayList)
+                                    restoreAdapter.notifyDataSetChanged()
+                                }
+                            }
+                        }
+                    }
+                })
             restoreAdapter.setRestoreFileDataListener(object: RestoreFileDataListener {
                 override fun file(mDataBean: DataBean) {
                     val storagePath = FileIOUtils.isStoragePath(mContext!!)
@@ -149,8 +156,7 @@ class RestoreViewModel {
                 }
 
             })
-        } else {
-            isShowData(true)
+            }
         }
     }
 

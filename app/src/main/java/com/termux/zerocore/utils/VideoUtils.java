@@ -17,6 +17,7 @@ public class VideoUtils implements MediaPlayer.OnPreparedListener, MediaPlayer.O
 
     }
     private VideoView mVideoView;
+    private boolean wasPlayingBeforePause = false;
 
     private static VideoUtils mVideoUtils = null;
 
@@ -64,7 +65,8 @@ public class VideoUtils implements MediaPlayer.OnPreparedListener, MediaPlayer.O
             LogUtils.d(TAG, "pause mVideoView isNull");
             return;
         }
-        if (mVideoView.isPlaying()) {
+        wasPlayingBeforePause = mVideoView.isPlaying();
+        if (wasPlayingBeforePause) {
             mVideoView.pause();
         }
     }
@@ -80,8 +82,13 @@ public class VideoUtils implements MediaPlayer.OnPreparedListener, MediaPlayer.O
             LogUtils.d(TAG, "onResume mVideoView isNull");
             return;
         }
-        if (!mVideoView.isPlaying()) {
-            mVideoView.setOnPreparedListener(this);
+        if (wasPlayingBeforePause) {
+            try {
+                mVideoView.start();
+            } catch (Exception e) {
+                LogUtils.d(TAG, "onResume start fail: " + e.getMessage());
+            }
+            wasPlayingBeforePause = false;
         }
     }
 

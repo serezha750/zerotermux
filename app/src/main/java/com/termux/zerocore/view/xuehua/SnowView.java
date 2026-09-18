@@ -85,4 +85,29 @@ public class SnowView extends View {
             invalidate();
         }
     };
+
+    /** Activity 进入后台时停止刷新，避免持续 onDraw 耗电。 */
+    public void pause() {
+        run = false;
+        Handler handler = getHandler();
+        if (handler != null) {
+            handler.removeCallbacks(runnable);
+        }
+    }
+
+    /** Activity 回到前台时恢复动画。 */
+    public void resume() {
+        if (run) {
+            return;
+        }
+        run = true;
+        if (getWidth() > 0 && getHeight() > 0 && snowflakes == null) {
+            resize(getWidth(), getHeight());
+        }
+        invalidate();
+    }
+
+    public boolean isRunning() {
+        return run;
+    }
 }

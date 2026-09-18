@@ -12,6 +12,10 @@ import com.termux.R
 import com.termux.zerocore.config.mainmenu.MainMenuPackageManager
 import com.termux.zerocore.config.mainmenu.view.adapter.MenuPackageZipAdapter
 import java.io.File
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /** Java 可调用的菜单包选择回调。 */
 fun interface MenuPackagePickCallback {
@@ -41,21 +45,29 @@ class MenuPackagePickDialog(context: Context) : BaseDialogDown(context) {
     fun refreshList() {
         val menuPath = MainMenuPackageManager.getMenuDirDisplayPath(context)
         pathView?.text = context.getString(R.string.menu_package_install_path_hint, menuPath)
-        val zipFiles = MainMenuPackageManager.listMenuZipFiles(context)
-        if (zipFiles.isEmpty()) {
-            pickList?.visibility = View.GONE
-            emptyView?.visibility = View.VISIBLE
-            emptyView?.text = context.getString(R.string.menu_package_install_empty, menuPath)
-            return
+        emptyView?.visibility = View.VISIBLE
+        emptyView?.text = "…"
+        pickList?.visibility = View.GONE
+        GlobalScope.launch(Dispatchers.IO) {
+            val zipFiles = MainMenuPackageManager.listMenuZipFiles(context)
+            withContext(Dispatchers.Main) {
+                if (!isShowing) return@withContext
+                if (zipFiles.isEmpty()) {
+                    pickList?.visibility = View.GONE
+                    emptyView?.visibility = View.VISIBLE
+                    emptyView?.text = context.getString(R.string.menu_package_install_empty, menuPath)
+                    return@withContext
+                }
+                emptyView?.visibility = View.GONE
+                pickList?.visibility = View.VISIBLE
+                val adapter = MenuPackageZipAdapter(zipFiles) { file ->
+                    dismiss()
+                    onPickListener?.onPick(file)
+                }
+                pickList?.layoutManager = LinearLayoutManager(context)
+                pickList?.adapter = adapter
+            }
         }
-        emptyView?.visibility = View.GONE
-        pickList?.visibility = View.VISIBLE
-        val adapter = MenuPackageZipAdapter(zipFiles) { file ->
-            dismiss()
-            onPickListener?.onPick(file)
-        }
-        pickList?.layoutManager = LinearLayoutManager(context)
-        pickList?.adapter = adapter
     }
 
     override fun show() {

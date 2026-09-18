@@ -460,6 +460,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
     @Override
     protected void onStop() {
         super.onStop();
+        pauseBeautifyEffects();
 
         Logger.logDebug(LOG_TAG, "onStop");
 
@@ -1817,10 +1818,55 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
     }
 
 
+
+    /** 后台暂停粒子 GL / 雪花 Canvas，前台再恢复。 */
+    private void pauseBeautifyEffects() {
+        try {
+            if (firework_view != null) {
+                firework_view.onPause();
+            }
+        } catch (Exception ignored) {
+        }
+        try {
+            if (xue_fragment != null) {
+                for (int i = 0; i < xue_fragment.getChildCount(); i++) {
+                    android.view.View child = xue_fragment.getChildAt(i);
+                    if (child instanceof com.termux.zerocore.view.xuehua.SnowView) {
+                        ((com.termux.zerocore.view.xuehua.SnowView) child).pause();
+                    }
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        VideoUtils.getInstance().pause();
+    }
+
+    private void resumeBeautifyEffects() {
+        VideoUtils.getInstance().onResume();
+        try {
+            if (firework_view != null
+                    && firework_view.getVisibility() == android.view.View.VISIBLE) {
+                firework_view.onResume();
+            }
+        } catch (Exception ignored) {
+        }
+        try {
+            if (xue_fragment != null) {
+                for (int i = 0; i < xue_fragment.getChildCount(); i++) {
+                    android.view.View child = xue_fragment.getChildAt(i);
+                    if (child instanceof com.termux.zerocore.view.xuehua.SnowView) {
+                        ((com.termux.zerocore.view.xuehua.SnowView) child).resume();
+                    }
+                }
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
-        VideoUtils.getInstance().pause();
+        pauseBeautifyEffects();
         getDrawer().smoothClose();
         /* X11 removed */
     }
@@ -3125,7 +3171,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         Logger.logVerbose(LOG_TAG, "onResume");
         // ZeroTermux add {@
         ZtForegroundActivityHolder.set(this);
-        VideoUtils.getInstance().onResume();
+        resumeBeautifyEffects();
         initUserData();
         /* X11 removed */
         // X11 removed
