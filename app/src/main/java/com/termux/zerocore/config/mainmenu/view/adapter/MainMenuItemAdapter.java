@@ -24,6 +24,23 @@ public class MainMenuItemAdapter extends RecyclerView.Adapter<MainMenuItemViewHo
     public MainMenuItemAdapter(Context context, ArrayList<MainMenuClickConfig> mainMenuClickConfigs) {
         mContext = context;
         mMainMenuClickConfigs = mainMenuClickConfigs;
+        setHasStableIds(true);
+    }
+
+    public void swapData(ArrayList<MainMenuClickConfig> data) {
+        if (mMainMenuClickConfigs == data) {
+            return;
+        }
+        mMainMenuClickConfigs = data;
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public long getItemId(int position) {
+        if (mMainMenuClickConfigs == null || position < 0 || position >= mMainMenuClickConfigs.size()) {
+            return RecyclerView.NO_ID;
+        }
+        return position;
     }
 
     @NonNull
@@ -61,7 +78,7 @@ public class MainMenuItemAdapter extends RecyclerView.Adapter<MainMenuItemViewHo
 
     @Override
     public int getItemCount() {
-        return mMainMenuClickConfigs.size();
+        return mMainMenuClickConfigs == null ? 0 : mMainMenuClickConfigs.size();
     }
 
     public void release() {

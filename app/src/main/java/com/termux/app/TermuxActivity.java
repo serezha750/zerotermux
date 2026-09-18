@@ -2401,7 +2401,12 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
  // @}
     private void initListMenu(ArrayList<MainMenuCategoryData> mainMenuCategoryDatas) {
         mMainMenuAdapter = new MainMenuAdapter(this, mainMenuCategoryDatas);
-        mMainMenuList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        if (mMainMenuList.getLayoutManager() == null) {
+            mMainMenuList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        }
+        mMainMenuList.setHasFixedSize(true);
+        mMainMenuList.setItemViewCacheSize(8);
+        mMainMenuList.setItemAnimator(null);
         mMainMenuList.setAdapter(mMainMenuAdapter);
     }
     // 美化设置

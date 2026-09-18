@@ -1501,14 +1501,14 @@ class EditTextActivity : AppCompatActivity() {
             flushLspDocumentChange()
             UUtils.showMsg(getString(R.string.editor_lsp_working))
             val tabSize = currentTabSize
-            Thread {
+            editorBackground {
                 val ok = lspManager.formatDocument(
                     file,
                     EditorLspManager.LANGUAGE_JAVA,
                     tabSize = tabSize,
                     insertSpaces = true
                 )
-                runOnUiThread {
+                editorOnMain {
                     UUtils.showMsg(
                         getString(
                             if (ok) R.string.editor_lsp_format_done
@@ -1520,7 +1520,7 @@ class EditTextActivity : AppCompatActivity() {
                         updateDirtyState()
                     }
                 }
-            }.start()
+            }
         }
     }
 
@@ -1601,11 +1601,16 @@ class EditTextActivity : AppCompatActivity() {
         manager.setDiagnosticsListener(null)
         manager.releaseActiveIfMine()
         code_editor?.diagnostics = null
-        Thread({
-            manager.closeAll()
-        }, "ZT-LSP-Shutdown").apply {
-            isDaemon = true
-            start()
+        // onDestroy 时 lifecycleScope 已取消，仍须关掉 LSP 子进程
+        val executor = java.util.concurrent.Executors.newSingleThreadExecutor { r ->
+            Thread(r, "ZT-LSP-Shutdown").also { it.isDaemon = true }
+        }
+        executor.execute {
+            try {
+                manager.closeAll()
+            } finally {
+                executor.shutdown()
+            }
         }
     }
 
@@ -2507,16 +2512,32 @@ class EditTextActivity : AppCompatActivity() {
         }
     }
 
+
+    /** 编辑器后台任务：绑定 lifecycle，Activity 销毁后自动取消。 */
+    private fun editorBackground(block: suspend () -> Unit) {
+        if (isFinishing || isDestroyed) return
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                block()
+            } catch (_: Exception) {
+            }
+        }
+    }
+
+    private suspend fun editorOnMain(block: () -> Unit) {
+        withContext(Dispatchers.Main) {
+            if (!isFinishing && !isDestroyed) {
+                block()
+            }
+        }
+    }
+
     private fun notifyLspDidSave(file: File, text: String) {
         if (!::lspManager.isInitialized || !lspEnabled) return
         val languageId = lspLanguageId(getFileExtension(file)) ?: return
         if (!lspManager.isLanguageInstalled(languageId)) return
-        Thread {
+        editorBackground {
             lspManager.didSave(file, languageId, text)
-        }.apply {
-            name = "ZT-LSP-DidSave"
-            isDaemon = true
-            start()
         }
     }
 
@@ -2569,19 +2590,18 @@ class EditTextActivity : AppCompatActivity() {
         val token = popup.showLoadingNear(anchorLine, anchorCol, title) {
             clearLspReferenceHighlight()
         }
-        Thread {
+        editorBackground {
             val locations = lspManager.references(file, languageId, line, column)
             val items = locations.map { loc ->
                 EditorLspSymbolPopup.buildReferenceItem(loc, word)
             }
-            runOnUiThread {
+            editorOnMain {
                 if (!popup.isTokenActive(token)) {
-                    // 用户已点别处取消
-                    return@runOnUiThread
+                    return@editorOnMain
                 }
                 if (locations.isEmpty()) {
                     popup.showEmpty(token, title, getString(R.string.editor_lsp_no_references))
-                    return@runOnUiThread
+                    return@editorOnMain
                 }
                 popup.showReferenceList(
                     token,
@@ -2597,10 +2617,6 @@ class EditTextActivity : AppCompatActivity() {
                     navigateToLspLocationResolved(cur, languageId, loc)
                 }
             }
-        }.apply {
-            name = "ZT-LSP-References"
-            isDaemon = true
-            start()
         }
     }
 
@@ -2615,20 +2631,16 @@ class EditTextActivity : AppCompatActivity() {
             ?: getString(R.string.editor_lsp_hover)
         flushLspDocumentChange()
         val token = popup.showLoadingNear(hit?.line ?: line, hit?.startColumn ?: column, title)
-        Thread {
+        editorBackground {
             val text = lspManager.hover(file, languageId, line, column)
-            runOnUiThread {
-                if (!popup.isTokenActive(token)) return@runOnUiThread
+            editorOnMain {
+                if (!popup.isTokenActive(token)) return@editorOnMain
                 if (text.isNullOrBlank()) {
                     popup.showEmpty(token, title, getString(R.string.editor_lsp_no_hover))
                 } else {
                     popup.showMessage(token, title, text)
                 }
             }
-        }.apply {
-            name = "ZT-LSP-Hover"
-            isDaemon = true
-            start()
         }
     }
 
@@ -2649,35 +2661,32 @@ class EditTextActivity : AppCompatActivity() {
         val markLine = editor.cursor.leftLine
         val markColumn = editor.cursor.leftColumn
         val requestId = showLspNavigationLoadingDialog() ?: return
-        Thread {
+        editorBackground {
             try {
                 // 同步当前缓冲，避免异步 didChange 未完成导致位置错乱
                 runCatching { lspManager.changeDocument(file, languageId, snapshot) }
-                if (isLspNavRequestCancelled(requestId)) return@Thread
+                if (isLspNavRequestCancelled(requestId)) return@editorBackground
                 var locations = lspManager.definition(file, languageId, queryLine, queryColumn)
-                if (isLspNavRequestCancelled(requestId)) return@Thread
+                if (isLspNavRequestCancelled(requestId)) return@editorBackground
                 // jdt-ls 偶发未就绪：短延迟重试一次（JDK 类型 System/String 常见）
                 if (locations.isEmpty()) {
-                    try {
-                        Thread.sleep(700L)
-                    } catch (_: InterruptedException) {
-                    }
-                    if (isLspNavRequestCancelled(requestId)) return@Thread
+                    kotlinx.coroutines.delay(700L)
+                    if (isLspNavRequestCancelled(requestId)) return@editorBackground
                     locations = lspManager.definition(file, languageId, queryLine, queryColumn)
                 }
-                if (isLspNavRequestCancelled(requestId)) return@Thread
+                if (isLspNavRequestCancelled(requestId)) return@editorBackground
                 if (locations.isEmpty()) {
-                    runOnUiThread {
-                        if (isLspNavRequestCancelled(requestId)) return@runOnUiThread
+                    editorOnMain {
+                        if (isLspNavRequestCancelled(requestId)) return@editorOnMain
                         dismissLspNavigationLoadingDialog()
                         UUtils.showMsg(getString(R.string.editor_lsp_no_definition))
                     }
-                    return@Thread
+                    return@editorBackground
                 }
                 var resolvedTarget: EditorLspLocation? = null
                 var lastRaw: EditorLspLocation = locations[0]
                 for (raw in locations) {
-                    if (isLspNavRequestCancelled(requestId)) return@Thread
+                    if (isLspNavRequestCancelled(requestId)) return@editorBackground
                     lastRaw = raw
                     val target = lspManager.resolveNavigationLocation(file, languageId, raw)
                     if (target != null && target.file.isFile) {
@@ -2685,8 +2694,8 @@ class EditTextActivity : AppCompatActivity() {
                         break
                     }
                 }
-                runOnUiThread {
-                    if (isLspNavRequestCancelled(requestId)) return@runOnUiThread
+                editorOnMain {
+                    if (isLspNavRequestCancelled(requestId)) return@editorOnMain
                     dismissLspNavigationLoadingDialog()
                     val target = resolvedTarget
                     if (target == null || !target.file.isFile) {
@@ -2699,19 +2708,19 @@ class EditTextActivity : AppCompatActivity() {
                                 }
                             )
                         )
-                        return@runOnUiThread
+                        return@editorOnMain
                     }
                     pushLspNavMark(file, markLine, markColumn)
                     navigateToLspLocation(target)
                 }
             } catch (_: Throwable) {
-                runOnUiThread {
-                    if (isLspNavRequestCancelled(requestId)) return@runOnUiThread
+                editorOnMain {
+                    if (isLspNavRequestCancelled(requestId)) return@editorOnMain
                     dismissLspNavigationLoadingDialog()
                     UUtils.showMsg(getString(R.string.editor_lsp_no_definition))
                 }
             }
-        }.start()
+        }
     }
 
     private fun isLspNavRequestCancelled(requestId: Int): Boolean {
@@ -2828,33 +2837,33 @@ class EditTextActivity : AppCompatActivity() {
         val languageId = lspLanguageId(getFileExtension(file)) ?: return
         flushLspDocumentChange()
         UUtils.showMsg(getString(R.string.editor_lsp_working))
-        Thread {
+        editorBackground {
             val actions = lspManager.codeActions(file, languageId, line, column, line, column)
-            runOnUiThread {
+            editorOnMain {
                 if (actions.isEmpty()) {
                     UUtils.showMsg(getString(R.string.editor_lsp_no_code_action))
-                    return@runOnUiThread
+                    return@editorOnMain
                 }
                 val labels = actions.map { it.title }.toTypedArray()
-                AlertDialog.Builder(this)
+                AlertDialog.Builder(this@EditTextActivity)
                     .setTitle(R.string.editor_lsp_code_actions)
                     .setItems(labels) { _, which ->
                         val action = actions.getOrNull(which) ?: return@setItems
-                        Thread {
+                        editorBackground {
                             val ok = lspManager.applyCodeAction(file, languageId, action)
-                            runOnUiThread {
+                            editorOnMain {
                                 if (!ok) UUtils.showMsg(getString(R.string.editor_lsp_no_code_action))
                                 else {
                                     flushLspDocumentChange()
                                     updateDirtyState()
                                 }
                             }
-                        }.start()
+                        }
                     }
                     .setNegativeButton(android.R.string.cancel, null)
                     .show()
             }
-        }.start()
+        }
     }
 
     private fun runOrganizeImports() {
@@ -2866,9 +2875,9 @@ class EditTextActivity : AppCompatActivity() {
         }
         flushLspDocumentChange()
         UUtils.showMsg(getString(R.string.editor_lsp_working))
-        Thread {
+        editorBackground {
             val ok = lspManager.organizeImports(file, languageId)
-            runOnUiThread {
+            editorOnMain {
                 UUtils.showMsg(
                     getString(
                         if (ok) R.string.editor_lsp_organize_imports_done
@@ -2880,7 +2889,7 @@ class EditTextActivity : AppCompatActivity() {
                     updateDirtyState()
                 }
             }
-        }.start()
+        }
     }
 
     private fun pushLspNavMark(file: File, line: Int, column: Int) {
@@ -2904,19 +2913,15 @@ class EditTextActivity : AppCompatActivity() {
             EditorJdtClassFileSupport.needsClassFileContents(location)
         ) {
             UUtils.showMsg(getString(R.string.editor_lsp_loading_class_source))
-            Thread {
+            editorBackground {
                 val resolved = lspManager.resolveNavigationLocation(workspaceFile, languageId, location)
-                runOnUiThread {
+                editorOnMain {
                     if (resolved == null || !resolved.file.isFile) {
                         UUtils.showMsg(getString(R.string.editor_lsp_class_source_failed))
                     } else {
                         navigateToLspLocation(resolved)
                     }
                 }
-            }.apply {
-                name = "ZT-LSP-ClassSource"
-                isDaemon = true
-                start()
             }
             return
         }

@@ -9,6 +9,9 @@ import com.termux.zerocore.http.HTTPIP
 import com.zp.z_file.content.TAG
 
 class UserSetManage private constructor() {
+    @Volatile
+    private var cachedUserBean: ZTUserBean? = null
+
     companion object {
         private var instance: UserSetManage? = null
             get() {
@@ -25,6 +28,11 @@ class UserSetManage private constructor() {
     }
 
     public fun getZTUserBean(): ZTUserBean {
+        cachedUserBean?.let { cached ->
+            if (!cached.isAiAgentPanelEnabled) {
+                return cached
+            }
+        }
         val zTUserBeanJson = SaveData.getStringOther(ZTConstant.ZT_USER_BEAN_KEY)
         val bean = if (zTUserBeanJson.isNullOrEmpty() || zTUserBeanJson == "def") {
             ZTUserBean()
@@ -40,13 +48,16 @@ class UserSetManage private constructor() {
         if (bean.isAiAgentPanelEnabled) {
             bean.isAiAgentPanelEnabled = false
             setZTUserBean(bean)
+            return bean
         }
+        cachedUserBean = bean
         return bean
     }
 
     public fun setZTUserBean(mZTUserBean: ZTUserBean) {
         // 强制关闭 AI 智能体面板，写入时一并压制
         mZTUserBean.isAiAgentPanelEnabled = false
+        cachedUserBean = mZTUserBean
         val toJson = Gson().toJson(mZTUserBean)
         SaveData.saveStringOther(ZTConstant.ZT_USER_BEAN_KEY, toJson)
     }
