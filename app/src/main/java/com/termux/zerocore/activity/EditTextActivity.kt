@@ -4669,4 +4669,18 @@ class EditTextActivity : AppCompatActivity() {
 
        /* binding.positionDisplay.text = text*/
     }
+
+    private fun saveCurrentTabSilentlyIfNeeded() {
+        storeCurrentTabState()
+        val file = currentFile ?: return
+        val tab = currentTab() ?: return
+        if (tab.previewOnly || isTextPreviewMode(tab) || !tab.dirty) return
+        val content = tab.content
+        if (UUtils.setFileString(file, content)) {
+            tab.savedContent = content
+            tab.dirty = false
+            isDirty = false
+            renderEditorTabs()
+        }
+    }
 }
