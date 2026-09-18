@@ -49,7 +49,6 @@ public class ZTUserBean {
     // 智能体 AI 对话历史（JSON）
     private String agentAiChatHistoryJson;
     // 编辑器 AI 对话历史（JSON，与智能体独立）
-    private String editorAiChatHistoryJson;
     // 智能体已启用的 Skill id 列表（JSON 数组）
     private String agentAiEnabledSkillsJson;
     // 智能体是否可读取/控制终端
@@ -353,16 +352,7 @@ public class ZTUserBean {
     public void setAgentAiChatHistoryJson(String agentAiChatHistoryJson) {
         this.agentAiChatHistoryJson = agentAiChatHistoryJson;
     }
-
-    public String getEditorAiChatHistoryJson() {
-        return editorAiChatHistoryJson;
-    }
-
-    public void setEditorAiChatHistoryJson(String editorAiChatHistoryJson) {
-        this.editorAiChatHistoryJson = editorAiChatHistoryJson;
-    }
-
-    public boolean isAgentAiTerminalEnabled() {
+public boolean isAgentAiTerminalEnabled() {
         return agentAiTerminalEnabled;
     }
 

@@ -3,7 +3,6 @@ package com.termux.zerocore.config.ztcommand;
 
 import android.util.SparseArray;
 
-import com.termux.zerocore.config.ztcommand.config.AVncConfig;
 import com.termux.zerocore.config.ztcommand.config.ConfirmedDialogConfig;
 import com.termux.zerocore.config.ztcommand.config.ForWardOpenLeftConfig;
 import com.termux.zerocore.config.ztcommand.config.ForWardOpenRightConfig;
@@ -46,7 +45,6 @@ public class ZTCommandConfigStore {
         map_array_command.put(ZTKeyConstants.ZT_COMMAND_REBOOT_1, ZTKeyConstants.ZT_ID_REBOOT);
 
         map_array_command.put(ZTKeyConstants.ZT_COMMAND_LN, ZTKeyConstants.ZT_ID_LN);
-        map_array_command.put(ZTKeyConstants.ZT_COMMAND_VNC, ZTKeyConstants.ZT_ID_VNC);
         // X11 命令映射已移除
 
         map_array_command.put(ZTKeyConstants.ZT_COMMAND_CONFIRMED_DIALOG, ZTKeyConstants.ZT_ID_CONFIRMED_DIALOG);
@@ -70,7 +68,6 @@ public class ZTCommandConfigStore {
         register(new XmlMenuConfig());
         register(new RebootConfig());
         register(new LnConfig());
-        register(new AVncConfig());
         // X11 config 注册已移除
         register(new ConfirmedDialogConfig());
         register(new QRCodeEncoderConfig());

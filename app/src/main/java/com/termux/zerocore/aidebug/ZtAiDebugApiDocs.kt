@@ -267,7 +267,7 @@ object ZtAiDebugApiDocs {
             ),
             mapOf(
                 "name" to if (lang == "zh") "logcat" else "logcat",
-                "cmd" to "curl -s \"$base/api/logs/logcat$q&lines=300&filter=EditorVncPanel\""
+                "cmd" to "curl -s \"$base/api/logs/logcat$q&lines=300&filter=EditTextActivity\""
             ),
             mapOf(
                 "name" to if (lang == "zh") "历史报错列表" else "Crash history",
@@ -476,7 +476,7 @@ object ZtAiDebugApiDocs {
                 "POST $base/api/terminal/exec?code=$codePh {\"command\":\"export DISPLAY=:99; pgrep -af x11vnc\",\"waitMs\":4000}",
                 "GET $base/api/files/read?code=$codePh&path=.zerotermux/x11vnc.log",
                 "GET $base/api/screenshot?code=$codePh",
-                "GET $base/api/logs/logcat?code=$codePh&lines=200&filter=EditorVncPanel"
+                "GET $base/api/logs/logcat?code=$codePh&lines=200&filter=EditTextActivity"
             )
         )
     }

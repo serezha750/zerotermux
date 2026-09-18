@@ -97,9 +97,9 @@ class ZtAiDebugHttpServer(
                         textResponse(ZtWorkstationFileHelper.readText(session.parms["path"] ?: ""), MIME_JSON)
                     }
                 uri == "/api/vnc/status" && method == Method.GET ->
-                    textResponse(ZtAiDebugVncHelper.statusJson(), MIME_JSON)
+                    textResponse("""{"ok":false,"error":"VNC support removed"}""", MIME_JSON)
                 uri == "/api/vnc/start" && method == Method.POST ->
-                    textResponse(ZtAiDebugVncHelper.startJson(), MIME_JSON)
+                    textResponse("""{"ok":false,"error":"VNC support removed"}""", MIME_JSON)
                 uri == "/api/editor/open" && method == Method.POST ->
                     handleEditorOpen(session)
                 uri == "/api/editor/lsp/status" && method == Method.GET ->
@@ -636,10 +636,18 @@ class ZtAiDebugHttpServer(
         }
         val openX11 = parseBool(session, body, "open_x11_tab", "openX11")
         val autoRun = parseBool(session, body, "auto_run", "autoRun")
-        return textResponse(
-            ZtAiDebugVncHelper.openEditorJson(appContext, path ?: "", openX11, autoRun),
-            MIME_JSON
-        )
+        return try {
+            val intent = android.content.Intent(appContext, com.termux.zerocore.activity.EditTextActivity::class.java).apply {
+                addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                if (!path.isNullOrBlank()) putExtra("path", path)
+                putExtra(com.termux.zerocore.activity.EditTextActivity.EXTRA_OPEN_X11_TAB, openX11)
+                putExtra(com.termux.zerocore.activity.EditTextActivity.EXTRA_AUTO_RUN, autoRun)
+            }
+            appContext.startActivity(intent)
+            textResponse("""{"ok":true,"path":"${path ?: ""}"}""", MIME_JSON)
+        } catch (e: Exception) {
+            textResponse("""{"ok":false,"error":"${e.message}"}""", MIME_JSON)
+        }
     }
 
     private fun handleEditorLspDefinition(session: IHTTPSession): Response {

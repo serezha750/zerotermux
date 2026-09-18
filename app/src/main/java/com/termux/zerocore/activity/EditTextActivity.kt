@@ -49,9 +49,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.xh_lib.utils.UUtils
 import com.termux.R
 import com.termux.zerocore.dialog.LoadingDialog
-import com.termux.zerocore.ai.editor.ZtEditorAiHost
-import com.termux.zerocore.ai.editor.ZtEditorAiPanelHelper
-import com.termux.zerocore.ai.editor.ZtEditorAiResetHelper
 import com.termux.zerocore.editor.AndroidProjectManager
 import com.termux.zerocore.editor.EditorBottomDockPanel
 import com.termux.zerocore.editor.EditorBuildScriptHelper
@@ -128,8 +125,10 @@ import java.util.regex.PatternSyntaxException
 import kotlin.math.abs
 import kotlin.math.max
 
-class EditTextActivity : AppCompatActivity(), ZtEditorAiHost {
+class EditTextActivity : AppCompatActivity() {
     companion object {
+        const val EXTRA_OPEN_X11_TAB = "extra_open_x11_tab"
+        const val EXTRA_AUTO_RUN = "extra_auto_run"
         val TAG = EditTextActivity::class.java.simpleName
         val CODE_JAVA = "source.java"
         val CODE_KOTLIN = "source.kotlin"
@@ -226,9 +225,6 @@ class EditTextActivity : AppCompatActivity(), ZtEditorAiHost {
     private var mEditorUndoButton: ImageView? = null
     private var mEditorRedoButton: ImageView? = null
     private var mEditorMoreButton: ImageView? = null
-    private var mEditorAiButton: TextView? = null
-    private var mEditorSidebarAiButton: TextView? = null
-    private var editorAiPanel: ZtEditorAiPanelHelper? = null
     private var mEditorTerminalButton: ImageView? = null
     private var mEditorFormatButton: ImageView? = null
     private var mEditorGotoDefButton: ImageView? = null
@@ -428,8 +424,8 @@ class EditTextActivity : AppCompatActivity(), ZtEditorAiHost {
     }
 
     private fun handleAiDebugIntentExtras() {
-        val openX11 = intent.getBooleanExtra(com.termux.zerocore.aidebug.ZtAiDebugVncHelper.EXTRA_OPEN_X11_TAB, false)
-        val autoRun = intent.getBooleanExtra(com.termux.zerocore.aidebug.ZtAiDebugVncHelper.EXTRA_AUTO_RUN, false)
+        val openX11 = intent.getBooleanExtra(EXTRA_OPEN_X11_TAB, false)
+        val autoRun = intent.getBooleanExtra(EXTRA_AUTO_RUN, false)
         if (openX11) {
             code_editor?.postDelayed({
                 editorBottomDock?.openX11Tab()
@@ -450,7 +446,6 @@ class EditTextActivity : AppCompatActivity(), ZtEditorAiHost {
         val ztUserBean = UserSetManage.get().getZTUserBean()
         code_editor?.isWordwrap = ztUserBean.isEditorWordWrap
         applyEditorFont(false)
-        initEditorAiPanel()
         initEditorTopBar()
         initEditorBottomDock(savedInstanceState)
         initSymbolInput()
@@ -474,8 +469,6 @@ class EditTextActivity : AppCompatActivity(), ZtEditorAiHost {
         mEditorUndoButton = findViewById(R.id.editor_action_undo)
         mEditorRedoButton = findViewById(R.id.editor_action_redo)
         mEditorMoreButton = findViewById(R.id.editor_action_more)
-        mEditorAiButton = findViewById(R.id.editor_action_ai)
-        mEditorSidebarAiButton = findViewById(R.id.editor_sidebar_ai)
         mEditorTerminalButton = findViewById(R.id.editor_action_terminal)
         mEditorFormatButton = findViewById(R.id.editor_action_format)
         mEditorGotoDefButton = findViewById(R.id.editor_action_goto_def)
@@ -644,7 +637,6 @@ class EditTextActivity : AppCompatActivity(), ZtEditorAiHost {
             forceShowSoftKeyboard()
         }
         mEditorX11Button?.setOnClickListener {
-            editorAiPanel?.dismissPanel()
             editorBottomDock?.openX11Tab()
             updateEditorX11ButtonState()
         }
@@ -654,9 +646,6 @@ class EditTextActivity : AppCompatActivity(), ZtEditorAiHost {
         mEditorMoreButton?.setOnClickListener { view ->
             showEditorMoreMenu(view)
         }
-        val editorAiClick = View.OnClickListener { editorAiPanel?.toggle() }
-        mEditorAiButton?.setOnClickListener(editorAiClick)
-        mEditorSidebarAiButton?.setOnClickListener(editorAiClick)
         mCancelText?.setOnClickListener {
             confirmExitIfDirty()
         }
@@ -688,31 +677,6 @@ class EditTextActivity : AppCompatActivity(), ZtEditorAiHost {
         }
     }
 
-    private fun initEditorAiPanel() {
-        val overlay = findViewById<View>(R.id.editor_ai_overlay) ?: return
-        // include 根视图 id 为 editor_ai_panel_root（与 TermuxActivity 智能体面板一致）
-        val panelRoot = findViewById<View>(R.id.editor_ai_panel_root) ?: return
-        val floatingBubble = findViewById<View>(R.id.editor_ai_floating_bubble)
-        val applyPanelHeight: () -> Unit = {
-            val hostHeight = overlay.height
-            if (hostHeight > 0) {
-                val targetHeight = (hostHeight * 0.45f).toInt().coerceAtLeast(dp(180))
-                val lp = panelRoot.layoutParams
-                if (lp != null && lp.height != targetHeight) {
-                    lp.height = targetHeight
-                    panelRoot.layoutParams = lp
-                }
-            }
-        }
-        overlay.viewTreeObserver.addOnGlobalLayoutListener { applyPanelHeight() }
-        overlay.setOnClickListener {
-            if (editorAiPanel?.isVisible() == true) {
-                editorAiPanel?.dismissPanel()
-            }
-        }
-        panelRoot.setOnClickListener { }
-        editorAiPanel = ZtEditorAiPanelHelper(overlay, panelRoot, floatingBubble, this, applyPanelHeight)
-    }
 
     private fun initEditorBottomDock(savedInstanceState: Bundle?) {
         val dockView = findViewById<View>(R.id.editor_bottom_dock) ?: return
@@ -758,11 +722,6 @@ class EditTextActivity : AppCompatActivity(), ZtEditorAiHost {
         val displayBtn = findViewById<TextView>(R.id.editor_x11_display)
         val connectBtn = findViewById<TextView>(R.id.editor_x11_connect)
         val maximize = findViewById<android.widget.ImageView>(R.id.editor_x11_maximize) ?: return
-        val vncExtraKeysView = findViewById<com.termux.shared.termux.extrakeys.ExtraKeysView>(
-            R.id.editor_vnc_extra_keys
-        )
-        vncExtraKeysView?.visibility = View.GONE
-
         editorX11Panel = EditorX11Panel(
             activity = this,
             surfaceContainer = surface,
@@ -1739,29 +1698,6 @@ class EditTextActivity : AppCompatActivity(), ZtEditorAiHost {
             }
             setOnClickListener { showLspServersDialog() }
         }
-        val editorAiResetButton = TextView(this).apply {
-            text = getString(R.string.zt_editor_ai_reset_title)
-            setTextColor(0xffd4d4d4.toInt())
-            textSize = 14f
-            gravity = android.view.Gravity.CENTER_VERTICAL
-            setPadding(dp(14), 0, dp(14), 0)
-            setBackgroundResource(R.drawable.shape_editor_symbol_key)
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                dp(40)
-            ).apply {
-                setMargins(0, dp(8), 0, 0)
-            }
-            setOnClickListener {
-                ZtEditorAiResetHelper.showResetConfirmDialog(this@EditTextActivity)
-            }
-        }
-        val editorAiResetSummary = TextView(this).apply {
-            text = getString(R.string.zt_editor_ai_reset_summary)
-            setTextColor(0xff9d9d9d.toInt())
-            textSize = 12f
-            setPadding(0, 0, 0, dp(6))
-        }
         val container = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(28), dp(14), dp(28), 0)
@@ -1780,9 +1716,6 @@ class EditTextActivity : AppCompatActivity(), ZtEditorAiHost {
             addView(lspTimeoutInput)
             addView(lspDescLabel)
             addView(lspManageButton)
-            addView(buildSettingsLabel(getString(R.string.zt_editor_ai_button)))
-            addView(editorAiResetSummary)
-            addView(editorAiResetButton)
         }
         val scrollView = ScrollView(this).apply {
             addView(container)
@@ -3318,12 +3251,10 @@ class EditTextActivity : AppCompatActivity(), ZtEditorAiHost {
         editorTerminalPanel?.onResume()
         editorX11Panel?.onResume()
         updateEditorX11ButtonState()
-        editorAiPanel?.reloadHistoryFromStore()
     }
 
     override fun onPause() {
         editorX11Panel?.onPause()
-        editorAiPanel?.persistHistory()
         super.onPause()
     }
 
@@ -3351,8 +3282,6 @@ class EditTextActivity : AppCompatActivity(), ZtEditorAiHost {
         editorX11Panel = null
         editorTerminalPanel?.destroy()
         editorTerminalPanel = null
-        editorAiPanel?.destroy()
-        editorAiPanel = null
         super.onDestroy()
     }
 
@@ -4739,417 +4668,5 @@ class EditTextActivity : AppCompatActivity(), ZtEditorAiHost {
         }
 
        /* binding.positionDisplay.text = text*/
-    }
-
-    override fun isEditorReady(): Boolean {
-        val tab = currentTab() ?: return false
-        return code_editor != null && !tab.previewOnly && !isTextPreviewMode(tab)
-    }
-
-    override fun captureSnapshot(maxChars: Int): String {
-        val editor = code_editor ?: return "Error: editor unavailable"
-        val tab = currentTab() ?: return "Error: no file open"
-        if (tab.previewOnly || isTextPreviewMode(tab)) {
-            return "Error: preview mode, editing disabled"
-        }
-        val full = editor.text.toString()
-        val cursor = editor.cursor
-        val limit = maxChars.coerceAtLeast(500)
-        val sb = StringBuilder()
-        sb.append("=== 编辑器快照 ===\n")
-        sb.append("当前文件: ").append(tab.file.absolutePath).append('\n')
-        if (editorTabs.size > 1) {
-            sb.append("已打开: ")
-            editorTabs.joinToString(", ") { t ->
-                val name = t.file.name
-                when {
-                    t.file.absolutePath == tab.file.absolutePath -> "$name*"
-                    t.dirty -> "$name(未保存)"
-                    else -> name
-                }
-            }.let { sb.append(it).append('\n') }
-        }
-        sb.append("光标: 行").append(cursor.leftLine + 1)
-            .append(" 列").append(cursor.leftColumn)
-            .append(" 偏移").append(cursor.left).append('\n')
-        if (cursor.isSelected) {
-            sb.append("选区: ").append(cursor.left).append("..").append(cursor.right)
-                .append(" (").append(cursor.right - cursor.left).append(" chars)\n")
-        }
-        sb.append("长度: ").append(full.length).append('\n')
-        appendDockSnapshot(sb)
-        sb.append("--- 内容 ---\n")
-        if (full.length > limit) {
-            sb.append(full, 0, limit).append("\n...[truncated, total ").append(full.length).append(" chars]")
-        } else {
-            sb.append(full)
-        }
-        return sb.toString()
-    }
-
-    override fun insertAtCursor(text: String): String {
-        val editor = code_editor ?: return "Error: editor unavailable"
-        if (!isEditorReady()) return getString(R.string.zt_editor_ai_unavailable)
-        val cursor = editor.cursor
-        editor.text.replace(
-            cursor.leftLine,
-            cursor.leftColumn,
-            cursor.rightLine,
-            cursor.rightColumn,
-            text
-        )
-        updateDirtyState()
-        return "Inserted ${text.length} chars at offset ${cursor.left}"
-    }
-
-    override fun replaceRange(start: Int, end: Int, text: String): String {
-        val editor = code_editor ?: return "Error: editor unavailable"
-        if (!isEditorReady()) return getString(R.string.zt_editor_ai_unavailable)
-        val content = editor.text
-        val length = content.length
-        if (start < 0 || end < start || end > length) {
-            return "Error: invalid range $start..$end (length $length)"
-        }
-        return try {
-            // 必须用 Content indexer：偏移落在 \r\n 分隔符上时，列会大于行长，
-            // 直接 replace(line,col) 会抛 Column out of bounds for CURSOR。
-            val startPos = cursorPositionForIndex(content, start)
-            val endPos = cursorPositionForIndex(content, end)
-            content.replace(startPos.first, startPos.second, endPos.first, endPos.second, text)
-            updateDirtyState()
-            "Replaced $start..$end with ${text.length} chars"
-        } catch (e: Exception) {
-            "Error: replace failed: ${e.message ?: "invalid range"}"
-        }
-    }
-
-    /**
-     * 将字符偏移转为可安全用于 Content.replace/delete 的光标行列。
-     * indexer 在行分隔符上会给出 column > lineLength，需归一到行尾或下一行行首。
-     */
-    private fun cursorPositionForIndex(content: Content, index: Int): Pair<Int, Int> {
-        val idx = index.coerceIn(0, content.length)
-        val pos = content.indexer.getCharPosition(idx)
-        val lineLen = content.getColumnCount(pos.line)
-        return when {
-            pos.column <= lineLen -> pos.line to pos.column
-            pos.line + 1 < content.lineCount -> (pos.line + 1) to 0
-            else -> pos.line to lineLen
-        }
-    }
-
-    override fun replaceAll(text: String): String {
-        val editor = code_editor ?: return "Error: editor unavailable"
-        if (!isEditorReady()) return getString(R.string.zt_editor_ai_unavailable)
-        // 先清掉诊断与气泡，避免 setText 后旧行号触发布局崩溃
-        editor.diagnostics = null
-        runCatching {
-            editor.getComponent(EditorDiagnosticTooltipWindow::class.java)?.dismiss()
-        }
-        editor.setText(text)
-        updateDirtyState()
-        return "Replaced entire content (${text.length} chars)"
-    }
-
-    override fun getCurrentEditorFilePath(): String? {
-        val tab = currentTab() ?: return null
-        if (tab.previewOnly || isTextPreviewMode(tab)) return null
-        return tab.file.absolutePath
-    }
-
-    override fun getCurrentEditorText(): String? {
-        if (!isEditorReady()) return null
-        return code_editor?.text?.toString()
-    }
-
-    override fun requestCodeEditConfirmation(
-        actionLabel: String,
-        summary: String,
-        diffBody: CharSequence,
-        onResult: (approved: Boolean) -> Unit
-    ) {
-        val showDialog = {
-            if (isFinishing || isDestroyed) {
-                onResult(false)
-            } else {
-                val content = layoutInflater.inflate(R.layout.dialog_zt_editor_ai_edit_confirm, null)
-                val fileView = content.findViewById<android.widget.TextView>(R.id.editor_ai_edit_confirm_file)
-                val summaryView = content.findViewById<android.widget.TextView>(R.id.editor_ai_edit_confirm_summary)
-                val diffView = content.findViewById<android.widget.TextView>(R.id.editor_ai_edit_confirm_diff)
-                val scroll = content.findViewById<android.widget.ScrollView>(R.id.editor_ai_edit_confirm_scroll)
-                val filePath = getCurrentEditorFilePath().orEmpty()
-                if (filePath.isBlank()) {
-                    fileView.visibility = android.view.View.GONE
-                } else {
-                    fileView.visibility = android.view.View.VISIBLE
-                    fileView.text = getString(R.string.zt_editor_ai_edit_confirm_file, filePath)
-                }
-                summaryView.text = summary
-                diffView.text = diffBody
-                // 高度随屏幕约 45%，保证长 diff 可滚
-                val maxH = (resources.displayMetrics.heightPixels * 0.45f).toInt().coerceAtLeast(200)
-                scroll.layoutParams = scroll.layoutParams.apply { height = maxH }
-                scroll.setOnTouchListener { v, _ ->
-                    v.parent?.requestDisallowInterceptTouchEvent(true)
-                    false
-                }
-                AlertDialog.Builder(this)
-                    .setTitle(getString(R.string.zt_editor_ai_edit_confirm_title, actionLabel))
-                    .setView(content)
-                    .setPositiveButton(android.R.string.ok) { _, _ -> onResult(true) }
-                    .setNegativeButton(android.R.string.cancel) { _, _ -> onResult(false) }
-                    .setOnCancelListener { onResult(false) }
-                    .show()
-            }
-        }
-        if (android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) {
-            showDialog()
-        } else {
-            runOnUiThread { showDialog() }
-        }
-    }
-
-    private fun resolveEditorPath(rawPath: String): File? {
-        val trimmed = rawPath.trim()
-        if (trimmed.isEmpty()) return null
-        return if (File(trimmed).isAbsolute) {
-            File(trimmed).normalize()
-        } else {
-            val base = currentFile?.parentFile ?: fileTreeCurrentDir ?: fileTreeRoot ?: return null
-            File(base, trimmed).normalize()
-        }
-    }
-
-    private fun saveCurrentTabSilentlyIfNeeded() {
-        storeCurrentTabState()
-        val file = currentFile ?: return
-        val tab = currentTab() ?: return
-        if (tab.previewOnly || isTextPreviewMode(tab) || !tab.dirty) return
-        val content = tab.content
-        if (UUtils.setFileString(file, content)) {
-            tab.savedContent = content
-            tab.dirty = false
-            isDirty = false
-            renderEditorTabs()
-        }
-    }
-
-    override fun createEditorFile(path: String, content: String, open: Boolean): String {
-        val target = resolveEditorPath(path) ?: return "Error: invalid path"
-        if (target.name.isEmpty()) return "Error: invalid file name"
-        if (target.exists()) {
-            return "Error: file already exists: ${target.absolutePath}. Use open_file instead."
-        }
-        val parent = target.parentFile
-        if (parent != null && !parent.exists() && !parent.mkdirs()) {
-            return "Error: failed to create directory ${parent.absolutePath}"
-        }
-        if (!runCatching { target.createNewFile() }.getOrDefault(false)) {
-            return "Error: failed to create ${target.absolutePath}"
-        }
-        if (!UUtils.setFileString(target, content)) {
-            target.delete()
-            return "Error: failed to write ${target.absolutePath}"
-        }
-        refreshFileTree()
-        updateSidebarProjectPath()
-        if (!canOpenFile(target)) {
-            return "Created ${target.absolutePath} (${content.length} chars), not editable in editor"
-        }
-        if (open) {
-            saveCurrentTabSilentlyIfNeeded()
-            loadFile(target)
-            return "Created and opened ${target.absolutePath} (${content.length} chars)"
-        }
-        return "Created ${target.absolutePath} (${content.length} chars)"
-    }
-
-    override fun openEditorFile(path: String): String {
-        val target = resolveEditorPath(path) ?: return "Error: invalid path"
-        if (!target.exists()) return "Error: file not found: ${target.absolutePath}"
-        if (!target.isFile) return "Error: not a file: ${target.absolutePath}"
-        if (!canOpenFile(target)) return "Error: cannot open in text editor: ${target.absolutePath}"
-        val previous = currentFile?.absolutePath
-        saveCurrentTabSilentlyIfNeeded()
-        loadFile(target)
-        return buildString {
-            append("Opened ${target.absolutePath}")
-            if (previous != null && previous != target.absolutePath) {
-                append(" (previous: $previous)")
-            }
-        }
-    }
-
-    override fun saveCurrentEditorFile(): String {
-        storeCurrentTabState()
-        val file = currentFile ?: return "Error: no file open"
-        val tab = currentTab() ?: return "Error: no active tab"
-        if (tab.previewOnly || isTextPreviewMode(tab)) {
-            return "Error: preview tab cannot be saved"
-        }
-        val content = tab.content
-        if (!UUtils.setFileString(file, content)) {
-            return "Error: failed to save ${file.absolutePath}"
-        }
-        tab.savedContent = content
-        tab.dirty = false
-        isDirty = false
-        renderEditorTabs()
-        return "Saved ${file.absolutePath} (${content.length} chars)"
-    }
-
-    override fun listOpenEditorFiles(): String {
-        if (editorTabs.isEmpty()) return "No files open"
-        val current = currentFile?.absolutePath
-        val sb = StringBuilder("Open editor tabs:\n")
-        for (tab in editorTabs) {
-            sb.append(if (tab.file.absolutePath == current) "• [active] " else "  ")
-                .append(tab.file.absolutePath)
-            if (tab.dirty) sb.append(" (unsaved)")
-            if (tab.previewOnly) sb.append(" (preview-only)")
-            sb.append('\n')
-        }
-        val base = currentFile?.parentFile?.absolutePath
-            ?: fileTreeCurrentDir?.absolutePath
-            ?: fileTreeRoot?.absolutePath
-        if (base != null) {
-            sb.append("Relative path base: ").append(base)
-        }
-        return sb.toString().trimEnd()
-    }
-
-    override fun releaseEditorInputForAiPanel() {
-        code_editor?.let { editor ->
-            editor.setSoftKeyboardEnabled(false)
-            KeyboardUtils.hideSoftKeyboard(this, editor)
-            editor.clearFocus()
-        }
-        currentFocus?.takeIf { it.id != R.id.editor_ai_panel_input }?.clearFocus()
-    }
-
-    override fun restoreEditorInputAfterAiPanel() {
-        code_editor?.setSoftKeyboardEnabled(true)
-    }
-
-    override fun isTerminalAvailable(): Boolean {
-        return editorTerminalPanel != null
-    }
-
-    override fun captureTerminalSnapshot(maxChars: Int): String {
-        val panel = editorTerminalPanel
-            ?: return getString(R.string.zt_editor_ai_terminal_unavailable)
-        return runTerminalOnUiForResult {
-            panel.ensureSessionForAi(resolveTerminalDirectory(currentFile))
-            panel.captureAiSnapshot(maxChars)
-        }
-    }
-
-    override fun sendTerminalText(text: String) {
-        editorTerminalPanel?.let { panel ->
-            runTerminalOnUiAction {
-                panel.ensureSessionForAi(resolveTerminalDirectory(currentFile))
-                panel.sendTextToTerminal(text)
-            }
-        }
-    }
-
-    override fun sendTerminalKey(key: String) {
-        editorTerminalPanel?.let { panel ->
-            runTerminalOnUiAction {
-                panel.ensureSessionForAi(resolveTerminalDirectory(currentFile))
-                panel.sendTerminalKey(key)
-            }
-        }
-    }
-
-    override fun runBuildScriptForAi(): String {
-        if (isProgramRunInProgress) {
-            return getString(R.string.zt_editor_ai_build_in_progress)
-        }
-        val runner = programRunner ?: return getString(R.string.zt_editor_ai_build_unavailable)
-        if (resolveTerminalDirectory(null) == null) {
-            return getString(R.string.zt_editor_ai_build_no_directory)
-        }
-        if (!runner.canUseTerminal()) {
-            return getString(R.string.zt_editor_ai_terminal_unavailable)
-        }
-        val tab = currentTab()
-        if (tab != null && (tab.previewOnly || isTextPreviewMode(tab))) {
-            return getString(R.string.zt_editor_ai_unavailable)
-        }
-        onRunBuildScriptClicked()
-        return getString(R.string.zt_editor_ai_build_started)
-    }
-
-    override fun switchEditorDockTab(tab: String): String {
-        val dock = editorBottomDock
-            ?: return getString(R.string.zt_editor_ai_dock_unavailable)
-        return when (tab.trim().lowercase(Locale.ROOT)) {
-            "gui", "x11" -> {
-                dock.openX11Tab()
-                getString(R.string.zt_editor_ai_dock_switched_gui)
-            }
-            "terminal", "term" -> {
-                dock.openTerminalTab()
-                getString(R.string.zt_editor_ai_dock_switched_terminal)
-            }
-            else -> getString(R.string.zt_editor_ai_dock_invalid_tab)
-        }
-    }
-
-    private fun appendDockSnapshot(sb: StringBuilder) {
-        val dock = editorBottomDock ?: return
-        sb.append("底部面板: ")
-            .append(if (dock.isVisible()) "展开" else "收起")
-            .append(", 终端标签=")
-            .append(if (dock.isTerminalOpen()) "开" else "关")
-            .append(", GUI标签=")
-            .append(if (dock.isX11Open()) "开" else "关")
-            .append(", 当前=")
-            .append(
-                when (dock.getActiveTab()) {
-                    EditorBottomDockPanel.Tab.X11 -> "GUI"
-                    EditorBottomDockPanel.Tab.TERMINAL -> "terminal"
-                }
-            )
-            .append('\n')
-        sb.append("GUI说明: 内置简易 GUI (Xvfb) DISPLAY=")
-            .append(EditorX11Environment.DISPLAY)
-            .append("，无需 sway 或主界面 X11 环境\n")
-    }
-
-    private fun runTerminalOnUiForResult(block: () -> String): String {
-        if (android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) {
-            return block()
-        }
-        val result = java.util.concurrent.atomic.AtomicReference<String>()
-        val latch = java.util.concurrent.CountDownLatch(1)
-        runOnUiThread {
-            try {
-                result.set(block())
-            } catch (e: Exception) {
-                result.set("Error: ${e.message ?: "terminal operation failed"}")
-            } finally {
-                latch.countDown()
-            }
-        }
-        latch.await(5, java.util.concurrent.TimeUnit.SECONDS)
-        return result.get() ?: getString(R.string.zt_editor_ai_terminal_unavailable)
-    }
-
-    private fun runTerminalOnUiAction(block: () -> Unit) {
-        if (android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) {
-            block()
-            return
-        }
-        val latch = java.util.concurrent.CountDownLatch(1)
-        runOnUiThread {
-            try {
-                block()
-            } finally {
-                latch.countDown()
-            }
-        }
-        latch.await(5, java.util.concurrent.TimeUnit.SECONDS)
     }
 }

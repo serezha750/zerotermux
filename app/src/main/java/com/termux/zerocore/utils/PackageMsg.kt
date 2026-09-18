@@ -24,7 +24,6 @@ object PackageMsg {
     final val ZERO_TERMUX_TERMUX_WEB_START = "org.join.web.serv"
     final val ZERO_TERMUX_TERMUX_FLOAT = "com.termux.window"
     final val ZERO_TERMUX_EG = "com.xinhao.zerocoremanage"
-    final val ZERO_TERMUX_VNC = "com.iiordanov.bVNC"
     final val REQUEST_CODE = 3000
     private var index: Int = 0
 
@@ -139,11 +138,6 @@ object PackageMsg {
         packageEg.packageName = ZERO_TERMUX_EG
         packageEg.showName = "EG(9/10)"
         arrayList.add(packageEg)
-
-        val packageVnc = PackageBean()
-        packageVnc.packageName = ZERO_TERMUX_VNC
-        packageVnc.showName = "VNC(10/10)"
-        arrayList.add(packageVnc)
 
         var mMessageBean = MessageBean()
         mMessageBean.mActivity = activity

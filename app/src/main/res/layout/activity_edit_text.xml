@@ -69,20 +69,6 @@
                 android:layout_height="1dp"
                 android:layout_weight="1" />
 
-            <TextView
-                android:id="@+id/editor_action_ai"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_marginLeft="3dp"
-                android:background="@drawable/shape_editor_toolbar_button"
-                android:contentDescription="@string/zt_editor_ai_button"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:gravity="center"
-                android:text="AI"
-                android:textColor="#48BAF3"
-                android:textSize="11sp"
-                android:textStyle="bold" />
-
             <ImageView
                 android:id="@+id/editor_action_files"
                 android:layout_width="32dp"
@@ -561,14 +547,6 @@
                             android:textSize="12sp" />
                     </LinearLayout>
                 </FrameLayout>
-
-                <com.termux.shared.termux.extrakeys.ExtraKeysView
-                    android:id="@+id/editor_vnc_extra_keys"
-                    style="?android:attr/buttonBarStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="64dp"
-                    android:background="#1E1E1E"
-                    android:orientation="horizontal" />
             </LinearLayout>
         </FrameLayout>
     </LinearLayout>
@@ -676,20 +654,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/editor_sidebar_ai"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginEnd="6dp"
-                android:background="@drawable/shape_editor_icon_button"
-                android:contentDescription="@string/zt_editor_ai_button"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:gravity="center"
-                android:text="AI"
-                android:textColor="#48BAF3"
-                android:textSize="13sp"
-                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/ok"
@@ -1163,38 +1127,4 @@
                 android:textSize="13sp" />
         </LinearLayout>
     </LinearLayout>
-
-    <FrameLayout
-        android:id="@+id/editor_ai_overlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#40000000"
-        android:clickable="true"
-        android:descendantFocusability="afterDescendants"
-        android:elevation="16dp"
-        android:focusable="false"
-        android:focusableInTouchMode="false"
-        android:visibility="gone">
-
-        <include
-            android:id="@+id/editor_ai_panel_root"
-            layout="@layout/view_editor_ai_panel"
-            android:layout_width="match_parent"
-            android:layout_height="360dp"
-            android:layout_gravity="bottom"
-            android:layout_marginHorizontal="8dp"
-            android:layout_marginBottom="8dp" />
-    </FrameLayout>
-
-    <include
-        android:id="@+id/editor_ai_floating_bubble"
-        layout="@layout/view_editor_ai_floating_bubble"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
-        android:layout_marginEnd="6dp"
-        android:elevation="24dp"
-        android:visibility="gone" />
-
 </RelativeLayout>
