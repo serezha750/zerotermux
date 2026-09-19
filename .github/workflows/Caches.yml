@@ -1,0 +1,27 @@
+name: 自动定期清理缓存
+
+on:
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+
+    permissions:
+      actions: write
+
+    steps:
+      - name: 清理当前仓库的所有缓存
+        run: |
+          echo "正在获取缓存列表..."
+          # 获取当前仓库的所有缓存 key 并循环删除
+          gh api --paginate -X GET /repos/${{ github.repository }}/actions/caches \
+            -q '.actions_caches[].key' | while read -r cache_key; do
+              if [ -n "$cache_key" ]; then
+                echo "正在删除缓存: $cache_key"
+                gh api -X DELETE "/repos/${{ github.repository }}/actions/caches?key=$cache_key" || true
+              fi
+            done
+          echo "缓存清理完成！"
+        env:
+          GH_TOKEN: ${{ github.token }}
