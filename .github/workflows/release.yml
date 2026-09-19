@@ -147,11 +147,18 @@ jobs:
       - name: 给 gradlew 执行权限
         run: chmod +x gradlew
 
+      - name: 下载 Bootstrap（NDK .incbin 依赖）
+        run: |
+          set -euo pipefail
+          ./gradlew --build-cache --stacktrace :app:downloadBootstraps
+          ls -la app/src/main/cpp/bootstrap-*.zip
+
       - name: 编译 Release（${{ inputs.arch }} / ${{ needs.resolve-version.outputs.version_name }}）
         run: |
           set -euo pipefail
           echo "TERMUX_APP_VERSION_NAME=$TERMUX_APP_VERSION_NAME"
           ./gradlew --build-cache --parallel --stacktrace \
+            :app:downloadBootstraps \
             :app:assembleRelease \
             -Darch=${{ inputs.arch }}
 
