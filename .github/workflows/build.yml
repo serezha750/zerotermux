@@ -111,6 +111,8 @@ jobs:
             exit 1
           fi
 
+          # bootstrap zip 须在 NDK 之前就绪
+          ./gradlew --build-cache --stacktrace :app:downloadBootstraps
           ./gradlew --build-cache --parallel --stacktrace $TASKS -Darch=${{ inputs.arch }}
 
       - name: 发布 Nightly Release (${{ steps.abi.outputs.abi }})

@@ -427,4 +427,12 @@ afterEvaluate {
     android.applicationVariants.all { variant ->
         variant.javaCompileProvider.get().dependsOn(downloadBootstraps)
     }
+    // NDK 编译 .S 的 .incbin 需要 bootstrap-*.zip，必须在 native 任务之前下载
+    tasks.matching { Task t ->
+        def n = t.name
+        n.startsWith("buildNdkBuild") || n.startsWith("configureNdkBuild") ||
+            n.startsWith("externalNativeBuild") || n.contains("NdkBuild")
+    }.configureEach { Task t ->
+        t.dependsOn(downloadBootstraps)
+    }
 }
