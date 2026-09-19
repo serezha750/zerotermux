@@ -1,0 +1,202 @@
+name: Release APK
+
+# 手动发布：从 app/build.gradle 读取 versionName，编译 Release 并可选创建 GitHub Release
+# 使用步骤：
+# 1. 在 app/build.gradle 改 versionName / versionCode 并 push
+# 2. Actions → Release APK → Run workflow
+# 3. 选架构；version_name 留空即用 gradle 里的版本
+
+on:
+  workflow_dispatch:
+    inputs:
+      arch:
+        description: '目标架构（真机常用 arm64）'
+        required: true
+        type: choice
+        default: arm64
+        options:
+          - arm64
+          - universal
+          - arm
+          - x86
+          - x86_64
+          - all
+      version_name:
+        description: '覆盖 versionName（留空 = 自动读 app/build.gradle）'
+        required: false
+        type: string
+        default: ''
+      create_github_release:
+        description: '编译成功后创建 GitHub Release（tag = v{versionName}）'
+        type: boolean
+        default: true
+      prerelease:
+        description: '标记为 Pre-release'
+        type: boolean
+        default: false
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  resolve-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version_name: ${{ steps.ver.outputs.version_name }}
+      version_code: ${{ steps.ver.outputs.version_code }}
+      tag_name: ${{ steps.ver.outputs.tag_name }}
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v6
+
+      - name: 读取 app/build.gradle 版本
+        id: ver
+        run: |
+          set -euo pipefail
+          GRADLE_FILE="app/build.gradle"
+          if [ ! -f "$GRADLE_FILE" ]; then
+            echo "::error::找不到 $GRADLE_FILE"
+            exit 1
+          fi
+
+          # 优先匹配 defaultConfig 段内的 versionName "x.y.z"
+          # 忽略注释行
+          PARSED_NAME=$(python3 - <<'PY'
+          import re
+          text = open("app/build.gradle", encoding="utf-8").read()
+          # 去掉 // 行注释，避免匹配到注释里的 versionName
+          lines = []
+          for line in text.splitlines():
+              if "//" in line:
+                  line = line[:line.index("//")]
+              lines.append(line)
+          body = "\n".join(lines)
+          names = re.findall(r'versionName\s+"([^"]+)"', body)
+          codes = re.findall(r'versionCode\s+(\d+)', body)
+          name = names[-1] if names else ""
+          code = codes[-1] if codes else ""
+          print(name)
+          open("/tmp/vcode.txt", "w").write(code)
+          PY
+          )
+          PARSED_CODE=$(cat /tmp/vcode.txt 2>/dev/null || true)
+
+          INPUT_NAME="${{ inputs.version_name }}"
+          if [ -n "${INPUT_NAME// }" ]; then
+            VERSION_NAME="$INPUT_NAME"
+            echo "使用手动输入的 versionName: $VERSION_NAME"
+          else
+            VERSION_NAME="$PARSED_NAME"
+            echo "从 app/build.gradle 读取 versionName: $VERSION_NAME"
+          fi
+
+          if [ -z "$VERSION_NAME" ]; then
+            echo "::error::无法解析 versionName，请在 app/build.gradle 设置 versionName \"x.y.z\" 或在工作流输入里填写"
+            exit 1
+          fi
+
+          TAG_NAME="v${VERSION_NAME}"
+          echo "version_name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
+          echo "version_code=${PARSED_CODE:-unknown}" >> "$GITHUB_OUTPUT"
+          echo "tag_name=$TAG_NAME" >> "$GITHUB_OUTPUT"
+          echo "### 版本信息" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **versionName**: \`$VERSION_NAME\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **versionCode**: \`${PARSED_CODE:-unknown}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **tag**: \`$TAG_NAME\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **arch**: \`${{ inputs.arch }}\`" >> "$GITHUB_STEP_SUMMARY"
+
+  build-release:
+    needs: resolve-version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      JAVA_VERSION: "17"
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+      # 覆盖 Gradle 里的 versionName（build.gradle 已支持 TERMUX_APP_VERSION_NAME）
+      TERMUX_APP_VERSION_NAME: ${{ needs.resolve-version.outputs.version_name }}
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: 配置 JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: 配置 Gradle
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          add-job-summary: on-failure
+          cache-cleanup: on-success
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY || '' }}
+
+      - name: 缓存 Bootstrap
+        uses: actions/cache@v5
+        with:
+          path: app/src/main/cpp/bootstrap-*.zip
+          key: bootstrap-${{ hashFiles('app/build.gradle') }}
+
+      - name: 给 gradlew 执行权限
+        run: chmod +x gradlew
+
+      - name: 编译 Release（${{ inputs.arch }} / ${{ needs.resolve-version.outputs.version_name }}）
+        run: |
+          set -euo pipefail
+          echo "TERMUX_APP_VERSION_NAME=$TERMUX_APP_VERSION_NAME"
+          ./gradlew --build-cache --parallel --stacktrace \
+            :app:assembleRelease \
+            -Darch=${{ inputs.arch }}
+
+      - name: 列出产物
+        id: apks
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/release-apks
+          find app/build/outputs/apk/release -name '*.apk' -type f -print0 2>/dev/null | while IFS= read -r -d '' f; do
+            cp -v "$f" /tmp/release-apks/
+          done
+          ls -la /tmp/release-apks/ || true
+          COUNT=$(find /tmp/release-apks -name '*.apk' | wc -l)
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+          if [ "$COUNT" -eq 0 ]; then
+            echo "::error::未找到 release APK"
+            exit 1
+          fi
+
+      - name: 上传 Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ZeroTermux-${{ needs.resolve-version.outputs.version_name }}-release-${{ inputs.arch }}
+          path: /tmp/release-apks/*.apk
+          if-no-files-found: error
+
+      - name: 创建 GitHub Release
+        if: ${{ inputs.create_github_release }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.resolve-version.outputs.tag_name }}
+          name: ZeroTermux ${{ needs.resolve-version.outputs.version_name }}
+          body: |
+            ## ZeroTermux ${{ needs.resolve-version.outputs.version_name }}
+
+            - **versionCode**: ${{ needs.resolve-version.outputs.version_code }}
+            - **架构**: `${{ inputs.arch }}`
+            - **提交**: ${{ github.sha }}
+            - **workflow**: Release APK（手动）
+
+            APK 文件名形如：`ZeroTermux-${{ needs.resolve-version.outputs.version_name }}-release_<abi>.apk`
+          files: /tmp/release-apks/*.apk
+          prerelease: ${{ inputs.prerelease }}
+          draft: false
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
